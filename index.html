@@ -842,6 +842,14 @@
             
             // 显示祝福语
             document.getElementById('fortuneText').textContent = fortune.text[game.language];
+
+             // 中文版时不显示英文翻译
+            const englishEl = document.getElementById('fortuneEnglish');
+            if (game.language === 'zh') {
+                englishEl.style.display = 'block';
+            } else {
+                englishEl.textContent = '';
+                englishEl.style.display = 'none';
             }
         }
 
@@ -883,3 +891,4 @@
 </body>
 
 </html>
+
