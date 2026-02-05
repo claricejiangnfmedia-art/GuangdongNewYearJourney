@@ -399,7 +399,7 @@
                     <button id="englishBtn" class="language-btn">🌏 English Version</button>
                 </div>
                 
-   <div class="language-hint">
+                <div class="language-hint">
                     <p>🐴 马年特别版 🎉</p>
                     <span>从年廿八到元宵节，体验完整广东年俗</span>
                 </div>
@@ -475,28 +475,28 @@
                     image: "images/新年签马到成功图去水印.png",
                     text: {
                         zh: "马到成功，事业腾飞！新一年如骏马奔腾，勇往直前，所有目标都能顺利达成！",
-                        en: "Galloping success! May your career soar like a swift horse, achieving all goals with speed and grace!"
+                        en: "Success comes with the horse! May your career soar like a galloping steed!"
                     }
                 },
                 {
                     image: "images/新年签财运亨通图去水印 (1).png",
                     text: {
                         zh: "财运亨通，利是多多！正财偏财一齐来，银行存款节节高！",
-                        en: "Wealth flows abundantly! May prosperity find you from every direction, filling your life with abundance!"
+                        en: "Wealth flows freely! May prosperity find you from all directions!"
                     }
                 },
                 {
                     image: "images/新年签桃花盛开图去水印.png",
                     text: {
                         zh: "桃花盛开，姻缘美满！单身遇良缘，有情人终成眷属！",
-                        en: "Love blossoms beautifully! May your heart find its perfect match, creating lasting bonds of happiness!"
+                        en: "Love blossoms! May you find your perfect match or deepen existing bonds!"
                     }
                 },
                 {
                     image: "images/新年签家庭和睦图去水印.png",
                     text: {
                         zh: "家庭和睦，幸福安康！家人健康快乐，团圆美满！",
-                         en: "Family harmony brings joy! May your home overflow with health, laughter and warm togetherness!"
+                        en: "Family harmony and good health! May your home be filled with joy!"
                     }
                 }
             ],
@@ -840,7 +840,10 @@
             };
             fortuneImg.style.display = 'block';
             
-           // 如果是中文版，显示英文翻译
+            // 显示祝福语
+            document.getElementById('fortuneText').textContent = fortune.text[game.language];
+            
+            // 如果是中文版，显示英文翻译
             const englishEl = document.getElementById('fortuneEnglish');
             if (game.language === 'zh') {
                 englishEl.textContent = fortune.text.en;
@@ -886,8 +889,8 @@
         window.onload = init;
     </script>
 </body>
-
 </html>
+
 
 
 
