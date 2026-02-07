@@ -522,38 +522,51 @@
         }
         
         .achievement-list {
-            text-align: left;
+            text-align: center;
             margin: 20px 0;
         }
         
         .achievement-item {
-            background: #e8f5e9;
-            padding: 10px 15px;
-            margin: 8px 0;
-            border-radius: 8px;
-            border-left: 4px solid #4CAF50;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            padding: 15px;
+            margin: 12px 0;
+            border-radius: 12px;
+            border: 3px solid #4CAF50;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+            animation: achievementPop 0.5s ease-out;
         }
         
-        .achievement-item.locked {
-            background: #f5f5f5;
-            color: #999;
-            border-left-color: #ccc;
+        @keyframes achievementPop {
+            0% { transform: scale(0.8); opacity: 0; }
+            70% { transform: scale(1.05); }
+            100% { transform: scale(1); opacity: 1; }
         }
         
-        .achievement-badge {
-            width: 24px;
-            height: 24px;
-            background: #ffd700;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
+        .achievement-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        
+        .achievement-name {
+            color: #2e7d32;
+            font-size: 18px;
             font-weight: bold;
-            color: #c1272d;
+            margin-bottom: 5px;
+        }
+        
+        .achievement-desc {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .no-achievement {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 10px;
+            color: #999;
+            font-style: italic;
+            margin: 20px 0;
         }
         
         .ending-action-btn {
@@ -692,8 +705,8 @@
                     <p class="rules-text">✨ <strong>好运值</strong>：影响新年签的质量</p>
                     <p class="rules-text">💰 <strong>利是钱</strong>：春节收到的红包金额</p>
                     <p class="rules-text">🎁 <strong>收集物品</strong>：解锁特殊成就</p>
-                    <p class="rules-text">不同的选择组合会解锁不同的成就，需要多次游玩才能集齐所有成就！</p>
-                    <p class="rules-text">所有场景完成后，将根据您的表现解锁不同的结局成就。</p>
+                    <p class="rules-text">不同的选择组合会解锁不同的成就！</p>
+                    <p class="rules-text">所有场景完成后，将根据您的表现获得本次游玩的成就。</p>
                     <p class="rules-text">最后，您将抽取专属的新年好运签！</p>
                     
                     <h3 class="rules-title">📝 Game Rules</h3>
@@ -702,8 +715,8 @@
                     <p class="rules-text english">✨ <strong>Luck Points</strong>: Affect fortune quality</p>
                     <p class="rules-text english">💰 <strong>Red Packets</strong>: Money received during New Year</p>
                     <p class="rules-text english">🎁 <strong>Collected Items</strong>: Unlock special achievements</p>
-                    <p class="rules-text english">Different choice combinations unlock different achievements. Replay to collect them all!</p>
-                    <p class="rules-text english">Complete all scenes to unlock different ending achievements.</p>
+                    <p class="rules-text english">Different choice combinations unlock different achievements!</p>
+                    <p class="rules-text english">Complete all scenes to get achievements for this playthrough.</p>
                     <p class="rules-text english">Finally, draw your unique New Year fortune!</p>
                     
                     <button class="rules-close" id="rulesClose">我知道了 / I Understand</button>
@@ -767,7 +780,7 @@
             <h2 id="endingTitle">🎊 春节旅程结束</h2>
             <img id="endingImage" alt="结局图片">
             <div class="ending-content">
-                <h3 id="endingResultTitle">您的春节成就</h3>
+                <h3 id="endingResultTitle">本次春节成就</h3>
                 <p id="endingResultText">根据您的选择，获得了以下成就...</p>
                 
                 <div class="ending-stats" id="endingStats"></div>
@@ -809,7 +822,7 @@
             collectedItems: [],
             achievements: [],
             lastOptionResult: null,
-            selectedOptions: [] // 记录所有选择的选项
+            selectedOptions: []
         };
 
         // ==================== 图片配置 ====================
@@ -1005,90 +1018,75 @@
                         ]
                     }
                 ],
-                // 成就系统 - 优化版，需要2-3次游玩才能集齐
+                // 成就系统 - 简化显示，只展示本次获得的
                 achievements: [
                     { 
                         id: 1, 
                         name: "🧹 传统守护者", 
-                        desc: "在所有场景中选择传统类选项",
-                        type: "路径",
+                        desc: "您恪守传统，选择了所有传统习俗",
+                        icon: "🏮",
                         condition: (game) => {
                             const traditionalChoices = ['打扫神台', '柚叶水抹门窗', '帮忙摆碗筷', '去阿公阿嫲家拜年'];
-                            return game.selectedOptions.every(opt => traditionalChoices.includes(opt));
+                            return game.selectedOptions.filter(opt => traditionalChoices.includes(opt)).length >= 3;
                         }
                     },
                     { 
                         id: 2, 
                         name: "🌸 浪漫主义者", 
-                        desc: "在花街选择桃花并追求幸福类选项",
-                        type: "路径",
+                        desc: "您选择了桃花，期待美好姻缘",
+                        icon: "💕",
                         condition: (game) => {
-                            return game.selectedOptions.includes('买一株桃花') && 
-                                   game.happiness >= 130;
+                            return game.selectedOptions.includes('买一株桃花') && game.happiness >= 120;
                         }
                     },
                     { 
                         id: 3, 
                         name: "💰 财富追求者", 
-                        desc: "获得200元以上利是钱且选择财富类选项",
-                        type: "路径",
+                        desc: "您获得了丰厚利是，财运亨通",
+                        icon: "💰",
                         condition: (game) => {
-                            return game.money >= 200 && 
-                                   game.selectedOptions.includes('买盆年桔');
+                            return game.money >= 150;
                         }
                     },
                     { 
                         id: 4, 
                         name: "🎯 全能体验家", 
-                        desc: "每个场景选择不同类型的选项",
-                        type: "收集",
+                        desc: "您尝试了多种不同的春节体验",
+                        icon: "🎨",
                         condition: (game) => {
-                            const optionTypes = game.selectedOptions.map(opt => {
-                                const scene = game.selectedOptions.indexOf(opt);
-                                const optionIndex = gameData.zh.scenes[scene]?.options.findIndex(o => o.text.includes(opt));
-                                return gameData.zh.scenes[scene]?.options[optionIndex]?.type;
-                            });
-                            const uniqueTypes = [...new Set(optionTypes.filter(t => t))];
-                            return uniqueTypes.length >= 4;
+                            return game.collectedItems.length >= 4;
                         }
                     },
                     { 
                         id: 5, 
                         name: "✨ 好运之星", 
-                        desc: "好运值达到140以上",
-                        type: "数值",
-                        condition: (game) => game.luck >= 140
+                        desc: "您的好运值爆棚，新年必定顺利",
+                        icon: "⭐",
+                        condition: (game) => game.luck >= 120
                     },
                     { 
                         id: 6, 
                         name: "🎉 幸福达人", 
-                        desc: "幸福度达到140以上",
-                        type: "数值",
-                        condition: (game) => game.happiness >= 140
+                        desc: "您的幸福度满满，春节快乐无比",
+                        icon: "😊",
+                        condition: (game) => game.happiness >= 120
                     },
                     { 
                         id: 7, 
                         name: "🍲 美食鉴赏家", 
-                        desc: "收集所有美食类物品",
-                        type: "收集",
+                        desc: "您参与了多种美食制作，品味春节",
+                        icon: "🍜",
                         condition: (game) => {
                             const foodItems = ['自制油角', '盆菜制作经验', '茶楼点心券'];
-                            return foodItems.every(item => game.collectedItems.includes(item));
+                            return game.collectedItems.filter(item => foodItems.includes(item)).length >= 2;
                         }
                     },
                     { 
                         id: 8, 
-                        name: "🎊 文化传承者", 
-                        desc: "收集至少5种不同类型物品",
-                        type: "收集",
-                        condition: (game) => game.collectedItems.length >= 5
-                    },
-                    { 
-                        id: 9, 
                         name: "🌟 完美春节", 
-                        desc: "一次性达成5个以上其他成就",
-                        type: "综合",
-                        condition: (game) => game.achievements.length >= 6
+                        desc: "您达成了多项成就，春节体验完美",
+                        icon: "🏆",
+                        condition: (game) => game.achievements.length >= 4
                     }
                 ]
             },
@@ -1227,90 +1225,75 @@
                         ]
                     }
                 ],
-                // 成就系统 - 优化版
+                // 成就系统 - 简化显示
                 achievements: [
                     { 
                         id: 1, 
                         name: "🧹 Tradition Keeper", 
-                        desc: "Choose traditional options in all scenes",
-                        type: "path",
+                        desc: "You followed traditional customs",
+                        icon: "🏮",
                         condition: (game) => {
                             const traditionalChoices = ['Clean the altar', 'Wipe with pomelo leaves', 'Set the table', 'Visit grandparents'];
-                            return game.selectedOptions.every(opt => traditionalChoices.includes(opt));
+                            return game.selectedOptions.filter(opt => traditionalChoices.includes(opt)).length >= 3;
                         }
                     },
                     { 
                         id: 2, 
                         name: "🌸 Romantic Soul", 
-                        desc: "Buy peach blossoms and pursue happiness",
-                        type: "path",
+                        desc: "You chose peach blossoms for love luck",
+                        icon: "💕",
                         condition: (game) => {
-                            return game.selectedOptions.includes('Buy peach blossoms') && 
-                                   game.happiness >= 130;
+                            return game.selectedOptions.includes('Buy peach blossoms') && game.happiness >= 120;
                         }
                     },
                     { 
                         id: 3, 
                         name: "💰 Wealth Seeker", 
-                        desc: "Get $200+ red packets and choose wealth options",
-                        type: "path",
+                        desc: "You received generous red packets",
+                        icon: "💰",
                         condition: (game) => {
-                            return game.money >= 200 && 
-                                   game.selectedOptions.includes('Buy kumquat tree');
+                            return game.money >= 150;
                         }
                     },
                     { 
                         id: 4, 
                         name: "🎯 All-Round Experiencer", 
-                        desc: "Choose different option types in each scene",
-                        type: "collection",
+                        desc: "You tried various New Year experiences",
+                        icon: "🎨",
                         condition: (game) => {
-                            const optionTypes = game.selectedOptions.map(opt => {
-                                const scene = game.selectedOptions.indexOf(opt);
-                                const optionIndex = gameData.en.scenes[scene]?.options.findIndex(o => o.text.includes(opt));
-                                return gameData.en.scenes[scene]?.options[optionIndex]?.type;
-                            });
-                            const uniqueTypes = [...new Set(optionTypes.filter(t => t))];
-                            return uniqueTypes.length >= 4;
+                            return game.collectedItems.length >= 4;
                         }
                     },
                     { 
                         id: 5, 
                         name: "✨ Lucky Star", 
-                        desc: "Reach 140+ luck points",
-                        type: "value",
-                        condition: (game) => game.luck >= 140
+                        desc: "You have exceptional luck for the new year",
+                        icon: "⭐",
+                        condition: (game) => game.luck >= 120
                     },
                     { 
                         id: 6, 
                         name: "🎉 Happiness Master", 
-                        desc: "Reach 140+ happiness",
-                        type: "value",
-                        condition: (game) => game.happiness >= 140
+                        desc: "You experienced great joy this New Year",
+                        icon: "😊",
+                        condition: (game) => game.happiness >= 120
                     },
                     { 
                         id: 7, 
                         name: "🍲 Food Connoisseur", 
-                        desc: "Collect all food items",
-                        type: "collection",
+                        desc: "You participated in various food preparations",
+                        icon: "🍜",
                         condition: (game) => {
                             const foodItems = ['Homemade Dumplings', 'Poon Choi Experience', 'Tea House Voucher'];
-                            return foodItems.every(item => game.collectedItems.includes(item));
+                            return game.collectedItems.filter(item => foodItems.includes(item)).length >= 2;
                         }
                     },
                     { 
                         id: 8, 
-                        name: "🎊 Culture Inheritor", 
-                        desc: "Collect 5+ different items",
-                        type: "collection",
-                        condition: (game) => game.collectedItems.length >= 5
-                    },
-                    { 
-                        id: 9, 
                         name: "🌟 Perfect Celebration", 
-                        desc: "Achieve 5+ other achievements in one play",
-                        type: "comprehensive",
-                        condition: (game) => game.achievements.length >= 6
+                        desc: "You achieved multiple accomplishments",
+                        icon: "🏆",
+                        condition: (game) => game.achievements.length >= 4
                     }
                 ]
             }
@@ -1406,6 +1389,7 @@
             
             // 更新结局页面
             document.getElementById('endingTitle').textContent = langData.endingTitle;
+            document.getElementById('endingResultTitle').textContent = game.language === 'zh' ? '本次春节成就' : 'This Playthrough Achievements';
             
             // 更新新年签页面
             document.getElementById('fortuneTitle').textContent = langData.fortuneTitle;
@@ -1481,7 +1465,7 @@
                 button.addEventListener('click', function() {
                     // 保存选项结果
                     game.lastOptionResult = option;
-                    // 记录选择的选项文本
+                    // 记录选择的选项文本（去掉emoji）
                     const optionText = option.text.replace(/[🧹🍃🎍🌸🍊🚶🥢🎁🍲🏡🏮🦁]/g, '').trim();
                     game.selectedOptions.push(optionText);
                     
@@ -1606,16 +1590,16 @@
             // 设置结局文本
             const endings = {
                 zh: [
-                    { title: "春节初体验", text: "您体验了完整的春节习俗，感受到传统魅力。继续探索不同选项，解锁更多成就吧！" },
-                    { title: "春节探索者", text: "不错的春节体验！您解锁了一些成就，但还有更多精彩等待发现！" },
-                    { title: "春节达人", text: "精彩的春节旅程！您解锁了多个成就，深入了解了广府年俗！" },
-                    { title: "春节大师", text: "完美的春节体验！您几乎达成了所有成就，展现了出色的选择智慧！" }
+                    { title: "春节初体验", text: "您体验了完整的春节习俗，感受到了传统魅力。" },
+                    { title: "春节探索者", text: "不错的春节体验！您解锁了一些特别的成就。" },
+                    { title: "春节达人", text: "精彩的春节旅程！您获得了多项成就。" },
+                    { title: "春节大师", text: "完美的春节体验！您展现了出色的选择智慧！" }
                 ],
                 en: [
-                    { title: "New Year Beginner", text: "You experienced complete traditions. Explore different choices to unlock more achievements!" },
-                    { title: "New Year Explorer", text: "Great New Year experience! You unlocked some achievements, more await discovery!" },
-                    { title: "New Year Expert", text: "Wonderful journey! You unlocked multiple achievements, deeply understanding traditions!" },
-                    { title: "New Year Master", text: "Perfect experience! You achieved most achievements with excellent choices!" }
+                    { title: "New Year Beginner", text: "You experienced complete traditions, feeling their charm." },
+                    { title: "New Year Explorer", text: "Great New Year experience! You unlocked special achievements." },
+                    { title: "New Year Expert", text: "Wonderful journey! You earned multiple achievements." },
+                    { title: "New Year Master", text: "Perfect experience! You showed excellent choices!" }
                 ]
             };
             
@@ -1640,33 +1624,50 @@
                 </div>
             `;
             
-            // 显示成就
+            // 显示本次获得的成就
             const achievementList = document.getElementById('achievementList');
-            let achievementsHTML = `<h4>${game.language === 'zh' ? '🎖️ 获得的成就' : '🎖️ Achievements'} (${game.achievements.length}/9)</h4>`;
-            
-            const allAchievements = langData.achievements;
-            allAchievements.forEach((ach, index) => {
-                const isUnlocked = game.achievements.includes(ach.id);
-                const badgeType = ach.type === 'path' ? '🛤️' : 
-                                 ach.type === 'value' ? '✨' : 
-                                 ach.type === 'collection' ? '🎁' : '🌟';
+            if (game.achievements.length > 0) {
+                let achievementsHTML = `<h4>${game.language === 'zh' ? '🎉 本次获得的成就' : '🎉 Achievements Earned'}</h4>`;
                 
+                // 获取成就详细信息
+                const earnedAchievements = langData.achievements.filter(ach => 
+                    game.achievements.includes(ach.id)
+                );
+                
+                earnedAchievements.forEach(ach => {
+                    achievementsHTML += `
+                        <div class="achievement-item">
+                            <div class="achievement-icon">${ach.icon}</div>
+                            <div class="achievement-name">${ach.name}</div>
+                            <div class="achievement-desc">${ach.desc}</div>
+                        </div>
+                    `;
+                });
+                
+                // 添加总结
                 achievementsHTML += `
-                    <div class="achievement-item ${isUnlocked ? '' : 'locked'}">
-                        <div class="achievement-badge">${badgeType}</div>
-                        ${isUnlocked ? '✅' : '🔒'} ${ach.name}
-                        <span style="font-size: 12px; color: #666; margin-left: auto;">${ach.desc}</span>
+                    <div style="margin-top: 15px; padding: 10px; background: #fff9e6; border-radius: 8px; border: 1px dashed #ff9a9e;">
+                        <strong>${game.language === 'zh' ? '本次共获得：' : 'Total earned: '}</strong>
+                        <span style="color: #c1272d; font-weight: bold;">${game.achievements.length}</span>
+                        ${game.language === 'zh' ? '个成就' : ' achievements'}
                     </div>
                 `;
-            });
-            
-            achievementList.innerHTML = achievementsHTML;
+                
+                achievementList.innerHTML = achievementsHTML;
+            } else {
+                achievementList.innerHTML = `
+                    <div class="no-achievement">
+                        ${game.language === 'zh' ? 
+                            '这次没有获得特殊成就，下次试试不同的选择吧！' : 
+                            'No special achievements this time. Try different choices next time!'}
+                    </div>
+                `;
+            }
             
             // 设置结论文本
-            const totalAchievements = game.achievements.length;
             const conclusionText = game.language === 'zh' 
-                ? `您共获得了 ${totalAchievements} 个成就！需要玩2-3次才能集齐所有9个成就。点击下方按钮抽取您的新年好运签！` 
-                : `You earned ${totalAchievements} achievements! Play 2-3 times to collect all 9 achievements. Click below to draw your New Year fortune!`;
+                ? `点击下方按钮抽取您的新年好运签！` 
+                : `Click below to draw your New Year fortune!`;
             
             document.getElementById('endingConclusion').textContent = conclusionText;
         }
@@ -1676,6 +1677,7 @@
             const langData = gameData[game.language];
             game.achievements = [];
             
+            // 计算所有成就
             langData.achievements.forEach(ach => {
                 if (ach.condition(game)) {
                     game.achievements.push(ach.id);
@@ -1689,10 +1691,10 @@
         function determineEndingType() {
             const unlockedCount = game.achievements.length;
             
-            if (unlockedCount >= 7) return 3; // 解锁7-9个成就：大师
-            if (unlockedCount >= 5) return 2; // 解锁5-6个成就：达人
-            if (unlockedCount >= 3) return 1; // 解锁3-4个成就：探索者
-            return 0; // 解锁0-2个成就：初体验
+            if (unlockedCount >= 5) return 3; // 解锁5个以上成就：大师
+            if (unlockedCount >= 3) return 2; // 解锁3-4个成就：达人
+            if (unlockedCount >= 1) return 1; // 解锁1-2个成就：探索者
+            return 0; // 没有成就：初体验
         }
 
         // ==================== 更新状态 ====================
@@ -1720,17 +1722,14 @@
             const achievementCount = game.achievements.length;
             
             let randomIndex;
-            if (achievementCount >= 7) {
+            if (achievementCount >= 5) {
                 // 高成就：高质量签
-                randomIndex = Math.floor(Math.random() * Math.min(2, fortunes.length));
-            } else if (achievementCount >= 5) {
-                // 中等成就
-                randomIndex = Math.floor(Math.random() * Math.min(3, fortunes.length));
+                randomIndex = Math.floor(Math.random() * 2); // 前两个最好的签
             } else if (achievementCount >= 3) {
-                // 一般成就
-                randomIndex = Math.floor(Math.random() * fortunes.length);
+                // 中等成就
+                randomIndex = Math.floor(Math.random() * 3); // 前三个
             } else {
-                // 低成就
+                // 一般或低成就
                 randomIndex = Math.floor(Math.random() * fortunes.length);
             }
             
