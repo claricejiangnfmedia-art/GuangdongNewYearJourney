@@ -852,78 +852,79 @@
             }
         };
 
-        // ==================== 图片配置 ====================
-        const gameImages = {
-            languageBg: "images/开屏图去水印 (1).png",
-            scenes: [
-                "images/年28打扫图去水印.png",
-                "images/年30行花街图去水印 (1).png", 
-                "images/年初一团年饭图去水印.png",
-                "images/元宵节逗利是图去水印.png"
-            ],
-            // 选项结果图片 - 根据您提供的文件名
-            optionResults: [
-                [
-                    "images/擦牌位去水印.png",
-                    "images/去霉运去水印.png", 
-                    "images/洗被褥去水印.png"
-                ],
-                [
-                    "images/买桃花去水印.png",
-                    "images/买年桔去水印.png",
-                    "images/欣赏花去水印.png"
-                ],
-                [
-                    "images/摆碗筷去水印.png",
-                    "images/包油角去水印.png",
-                    "images/备盆菜去水印.png"
-                ],
-                [
-                    "images/给利是去水印.png",
-                    "images/吃点心去水印.png",
-                    "images/看舞狮去水印.png"
-                ]
-            ],
-            // 结局图片 - 根据您提供的文件名
-            endings: {
-                wealth: "images/财富结局去水印.png",
-                luck: "images/好运结局去水印.png",
-                happiness: "images/幸福结局去水印.png",
-                perfect: "images/完美结局去水印.png",
-                default: "images/普通结局图.png"
-            },
-            fortunes: [
-                {
-                    image: "images/新年签马到成功图去水印.png",
-                    text: {
-                        zh: "马到成功，事业腾飞！新一年如骏马奔腾，勇往直前，所有目标都能顺利达成！",
-                        en: "Success comes with the horse! May your career soar like a galloping steed!"
-                    }
-                },
-                {
-                    image: "images/新年签财运亨通图去水印 (1).png",
-                    text: {
-                        zh: "财运亨通，利是多多！正财偏财一齐来，银行存款节节高！",
-                        en: "Wealth flows freely! May prosperity find you from all directions!"
-                    }
-                },
-                {
-                    image: "images/新年签桃花盛开图去水印.png",
-                    text: {
-                        zh: "桃花盛开，姻缘美满！单身遇良缘，有情人终成眷属！",
-                        en: "Love blossoms! May you find your perfect match or deepen existing bonds!"
-                    }
-                },
-                {
-                    image: "images/新年签家庭和睦图去水印.png",
-                    text: {
-                        zh: "家庭和睦，幸福安康！家人健康快乐，团圆美满！",
-                        en: "Family harmony and good health! May your home be filled with joy!"
-                    }
-                }
-            ],
-            qrcode: "images/分享二维码.png"
-        };
+      // ==================== 图片配置 ====================
+const gameImages = {
+    languageBg: "images/开屏图去水印 (1).png",
+    scenes: [
+        "images/年28打扫图去水印.png",
+        "images/年30行花街图去水印 (1).png", 
+        "images/年初一团年饭图去水印.png",
+        "images/元宵节逗利是图去水印.png"
+    ],
+    // 选项结果图片 - 已更正文件名
+    optionResults: [
+        [
+            "images/擦牌位去水印.png",      // 第一场景选项1 - 打扫神台（更正）
+            "images/去霉运去水印.png",       // 第一场景选项2 - 柚叶水
+            "images/洗被褥去水印.png"        // 第一场景选项3 - 洗被褥
+        ],
+        [
+            "images/买桃花去水印.png",        // 第二场景选项1 - 买桃花
+            "images/买年桔去水印.png",        // 第二场景选项2 - 买年桔（更正）
+            "images/欣赏花去水印.png"         // 第二场景选项3 - 欣赏花（更正）
+        ],
+        [
+            "images/摆碗筷去水印.png",        // 第三场景选项1 - 摆碗筷
+            "images/包油角去水印.png",        // 第三场景选项2 - 包油角（更正）
+            "images/备盆菜去水印.png"         // 第三场景选项3 - 备盆菜
+        ],
+        [
+            "images/给利是去水印.png",        // 第四场景选项1 - 给利是
+            "images/吃点心去水印.png",        // 第四场景选项2 - 吃点心
+            "images/看舞狮去水印.png"         // 第四场景选项3 - 看舞狮
+        ]
+    ],
+    // 结局图片
+    endings: {
+        wealth: "images/财富结局去水印.png",
+        luck: "images/好运结局去水印.png",
+        happiness: "images/幸福结局去水印.png",
+        perfect: "images/完美结局去水印.png",
+        default: "images/普通结局图.png"
+    },
+    // 新年签图片
+    fortunes: [
+        {
+            image: "images/新年签马到成功图去水印.png",
+            text: {
+                zh: "马到成功，事业腾飞！新一年如骏马奔腾，勇往直前，所有目标都能顺利达成！",
+                en: "Success comes with the horse! May your career soar like a galloping steed!"
+            }
+        },
+        {
+            image: "images/新年签财运亨通图去水印 (1).png",
+            text: {
+                zh: "财运亨通，利是多多！正财偏财一齐来，银行存款节节高！",
+                en: "Wealth flows freely! May prosperity find you from all directions!"
+            }
+        },
+        {
+            image: "images/新年签桃花盛开图去水印.png",
+            text: {
+                zh: "桃花盛开，姻缘美满！单身遇良缘，有情人终成眷属！",
+                en: "Love blossoms! May you find your perfect match or deepen existing bonds!"
+            }
+        },
+        {
+            image: "images/新年签家庭和睦图去水印.png",
+            text: {
+                zh: "家庭和睦，幸福安康！家人健康快乐，团圆美满！",
+                en: "Family harmony and good health! May your home be filled with joy!"
+            }
+        }
+    ],
+    qrcode: "images/分享二维码.png"
+};
 
         // ==================== 游戏数据 ====================
         const gameData = {
@@ -1660,75 +1661,104 @@
             updateStatus();
         }
 
-        // ==================== 显示拍立得弹窗 ====================
-        function showPolaroidModal(option) {
-            const modal = document.getElementById('polaroidModal');
-            const polaroidImage = document.getElementById('polaroidImage');
-            const polaroidDesc = document.getElementById('polaroidDesc');
-            const polaroidStats = document.getElementById('polaroidStats');
-            const polaroidCollect = document.getElementById('polaroidCollect');
+      // ==================== 显示拍立得弹窗 ====================
+function showPolaroidModal(option) {
+    const modal = document.getElementById('polaroidModal');
+    const polaroidImage = document.getElementById('polaroidImage');
+    const polaroidDesc = document.getElementById('polaroidDesc');
+    const polaroidStats = document.getElementById('polaroidStats');
+    const polaroidCollect = document.getElementById('polaroidCollect');
+    
+    // 设置拍立得图片 - 使用您提供的选项反馈图片
+    if (game.currentScene < gameImages.optionResults.length) {
+        const sceneImages = gameImages.optionResults[game.currentScene];
+        if (option.imageIndex !== undefined && option.imageIndex < sceneImages.length) {
+            // 设置图片路径
+            polaroidImage.src = sceneImages[option.imageIndex];
             
-            // 设置拍立得图片 - 使用您提供的选项反馈图片
-            if (game.currentScene < gameImages.optionResults.length) {
-                const sceneImages = gameImages.optionResults[game.currentScene];
-                if (option.imageIndex !== undefined && option.imageIndex < sceneImages.length) {
-                    polaroidImage.src = sceneImages[option.imageIndex];
-                } else {
+            // 添加图片加载失败的回调
+            polaroidImage.onerror = function() {
+                console.log(`选项图片加载失败: ${sceneImages[option.imageIndex]}`);
+                // 如果加载失败，使用场景图作为备用
+                if (game.currentScene < gameImages.scenes.length) {
                     polaroidImage.src = gameImages.scenes[game.currentScene];
-                }
-            } else {
-                polaroidImage.src = gameImages.scenes[game.currentScene];
-            }
-            
-            polaroidDesc.textContent = option.result;
-            
-            let statsHTML = '';
-            if (option.luck) {
-                statsHTML += `
-                    <div class="stat-item">
-                        <div class="stat-value">${option.luck > 0 ? '+' : ''}${option.luck}</div>
-                        <div class="stat-label">${game.language === 'zh' ? '好运值' : 'Luck'}</div>
-                    </div>
-                `;
-            }
-            if (option.money) {
-                const moneyText = game.language === 'zh' ? `¥${option.money > 0 ? '+' : ''}${option.money}` : `$${option.money > 0 ? '+' : ''}${option.money}`;
-                statsHTML += `
-                    <div class="stat-item">
-                        <div class="stat-value">${moneyText}</div>
-                        <div class="stat-label">${game.language === 'zh' ? '利是钱' : 'Money'}</div>
-                    </div>
-                `;
-            }
-            if (option.happiness) {
-                statsHTML += `
-                    <div class="stat-item">
-                        <div class="stat-value">${option.happiness > 0 ? '+' : ''}${option.happiness}</div>
-                        <div class="stat-label">${game.language === 'zh' ? '幸福度' : 'Happiness'}</div>
-                    </div>
-                `;
-            }
-            
-            polaroidStats.innerHTML = statsHTML;
-            
-            if (option.collect) {
-                polaroidCollect.textContent = `${game.language === 'zh' ? '收集到：' : 'Collected: '}${option.collect}`;
-                polaroidCollect.style.display = 'block';
-            } else {
-                polaroidCollect.style.display = 'none';
-            }
-            
-            modal.classList.add('active');
-            
-            setTimeout(() => {
-                game.currentScene++;
-                if (game.currentScene < gameData[game.language].scenes.length) {
-                    loadScene();
                 } else {
-                    setTimeout(showEndingPage, 500);
+                    // 如果连场景图都没有，显示一个喜庆的纯色背景
+                    polaroidImage.style.display = 'none';
+                    const polaroid = document.querySelector('.polaroid');
+                    if (polaroid) {
+                        polaroid.style.background = 'linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%)';
+                    }
                 }
-            }, 1500);
+            };
+            
+            // 添加图片加载成功的回调
+            polaroidImage.onload = function() {
+                console.log(`选项图片加载成功: ${sceneImages[option.imageIndex]}`);
+                polaroidImage.style.display = 'block';
+            };
+        } else {
+            polaroidImage.src = gameImages.scenes[game.currentScene];
         }
+    } else {
+        polaroidImage.src = gameImages.scenes[game.currentScene];
+    }
+    
+    // 设置描述
+    polaroidDesc.textContent = option.result;
+    
+    // 设置统计数据
+    let statsHTML = '';
+    if (option.luck) {
+        statsHTML += `
+            <div class="stat-item">
+                <div class="stat-value">${option.luck > 0 ? '+' : ''}${option.luck}</div>
+                <div class="stat-label">${game.language === 'zh' ? '好运值' : 'Luck'}</div>
+            </div>
+        `;
+    }
+    if (option.money) {
+        const moneyText = game.language === 'zh' ? `¥${option.money > 0 ? '+' : ''}${option.money}` : `$${option.money > 0 ? '+' : ''}${option.money}`;
+        statsHTML += `
+            <div class="stat-item">
+                <div class="stat-value">${moneyText}</div>
+                <div class="stat-label">${game.language === 'zh' ? '利是钱' : 'Money'}</div>
+            </div>
+        `;
+    }
+    if (option.happiness) {
+        statsHTML += `
+            <div class="stat-item">
+                <div class="stat-value">${option.happiness > 0 ? '+' : ''}${option.happiness}</div>
+                <div class="stat-label">${game.language === 'zh' ? '幸福度' : 'Happiness'}</div>
+            </div>
+        `;
+    }
+    
+    polaroidStats.innerHTML = statsHTML;
+    
+    // 设置收集物品
+    if (option.collect) {
+        polaroidCollect.textContent = `${game.language === 'zh' ? '收集到：' : 'Collected: '}${option.collect}`;
+        polaroidCollect.style.display = 'block';
+    } else {
+        polaroidCollect.style.display = 'none';
+    }
+    
+    // 显示弹窗
+    modal.classList.add('active');
+    
+    // 延迟进入下一个场景
+    setTimeout(() => {
+        game.currentScene++;
+        if (game.currentScene < gameData[game.language].scenes.length) {
+            loadScene();
+        } else {
+            // 所有场景完成，显示结局
+            setTimeout(showEndingPage, 500);
+        }
+    }, 1500);
+}
 
         // ==================== 显示结局页面 ====================
         function showEndingPage() {
@@ -1952,4 +1982,5 @@
     </script>
 </body>
 </html>
+
 
