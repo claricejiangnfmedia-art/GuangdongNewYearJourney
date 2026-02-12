@@ -2,10 +2,10 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>广府年味之旅 | Guangdong New Year Journey</title>
     <style>
-        /* 基础样式 */
+        /* 基础样式 - 优化版 */
         * {
             margin: 0;
             padding: 0;
@@ -20,90 +20,99 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 0;
+            margin: 0;
         }
         
         .game-container {
             width: 100%;
             max-width: 400px;
-            height: 85vh;
+            height: 100vh;
+            max-height: 900px;
             background: white;
-            border-radius: 25px;
-            overflow: hidden;
+            border-radius: 0;
+            overflow-y: auto;
+            overflow-x: hidden;
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
             position: relative;
+            -webkit-overflow-scrolling: touch;
         }
         
         .page {
             width: 100%;
-            height: 100%;
+            min-height: 100%;
             display: none;
-            position: absolute;
+            position: relative;
             top: 0;
             left: 0;
+            padding-bottom: 20px;
         }
         
         .page.active {
             display: block;
         }
         
-        /* ============ 开屏页面样式 ============ */
+        /* ============ 开屏页面样式 - 优化滚动适配 ============ */
         #languagePage {
             position: relative;
             background: linear-gradient(135deg, #c1272d 0%, #ff6b6b 100%);
+            min-height: 100%;
         }
         
         #bgImage {
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            filter: brightness(1) !important;
-            opacity: 1 !important;
-        }
-        
-        .language-content {
             position: absolute;
             top: 0;
             left: 0;
+            object-fit: cover;
+            filter: brightness(0.8);
+            opacity: 0.6;
+        }
+        
+        .language-content {
+            position: relative;
             width: 100%;
-            height: 100%;
+            min-height: 100%;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 30px;
+            padding: 40px 20px 60px;
             text-align: center;
             background: linear-gradient(
                 180deg, 
-                rgba(255, 215, 0, 0.3) 0%, 
+                rgba(255, 215, 0, 0.2) 0%, 
                 rgba(255, 107, 107, 0.2) 50%,
                 rgba(193, 39, 45, 0.3) 100%
             );
         }
         
-        /* 规则按钮 */
+        /* 规则按钮 - 固定位置 */
         .rules-btn {
-            position: absolute;
+            position: sticky;
             top: 15px;
             right: 15px;
+            margin-left: auto;
             width: 40px;
             height: 40px;
-            background: rgba(255, 215, 0, 0.9);
+            background: rgba(255, 215, 0, 0.95);
             border: 2px solid #c1272d;
             border-radius: 50%;
             color: #c1272d;
             font-size: 20px;
             font-weight: bold;
             cursor: pointer;
-            z-index: 10;
+            z-index: 100;
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
         
         /* 规则弹窗 */
         .rules-modal {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
@@ -112,7 +121,10 @@
             display: none;
             justify-content: center;
             align-items: center;
-            z-index: 100;
+            z-index: 1000;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 20px;
         }
         
         .rules-modal.active {
@@ -121,14 +133,15 @@
         
         .rules-content {
             background: white;
-            width: 85%;
+            width: 100%;
             max-width: 350px;
             border-radius: 20px;
             padding: 25px;
-            max-height: 80vh;
+            max-height: 90vh;
             overflow-y: auto;
             border: 5px solid #ffd700;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            margin: auto;
         }
         
         .rules-title {
@@ -168,19 +181,21 @@
             width: 100%;
         }
         
+        /* 优化标题排版 */
         .language-title {
             color: #ffd700 !important;
-            font-size: 36px;
+            font-size: clamp(28px, 8vw, 36px);
             margin-bottom: 15px;
             text-shadow: 3px 3px 0 rgba(193, 39, 45, 0.9);
             font-weight: bold;
             line-height: 1.2;
-            padding: 0 20px;
+            padding: 0 10px;
+            width: 100%;
         }
         
         .language-title span {
             display: block;
-            font-size: 24px;
+            font-size: clamp(18px, 5vw, 24px);
             margin-top: 10px;
             color: white;
             text-shadow: 2px 2px 0 rgba(193, 39, 45, 0.8);
@@ -189,14 +204,15 @@
         
         .language-subtitle {
             color: white !important;
-            font-size: 18px;
-            margin-bottom: 50px;
+            font-size: clamp(16px, 4.5vw, 18px);
+            margin-bottom: 40px;
             text-shadow: 1px 1px 2px rgba(193, 39, 45, 0.9);
-            background: rgba(193, 39, 45, 0.7);
+            background: rgba(193, 39, 45, 0.8);
             padding: 12px 25px;
             border-radius: 20px;
             line-height: 1.5;
             max-width: 320px;
+            width: 90%;
         }
         
         .language-buttons {
@@ -209,11 +225,11 @@
         }
         
         .language-btn {
-            padding: 20px;
-            font-size: 1.2rem;
+            padding: 18px 20px;
+            font-size: 1.1rem;
             border: none;
             border-radius: 50px;
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.98);
             color: #c1272d !important;
             cursor: pointer;
             transition: all 0.3s;
@@ -233,13 +249,14 @@
         .language-hint {
             margin-top: 20px;
             color: #ffd700;
-            font-size: 18px;
+            font-size: clamp(16px, 4.5vw, 18px);
             text-shadow: 1px 1px 0 #c1272d;
-            background: rgba(193, 39, 45, 0.6);
+            background: rgba(193, 39, 45, 0.8);
             padding: 12px 20px;
             border-radius: 15px;
             border: 2px solid #ffd700;
             max-width: 300px;
+            width: 90%;
         }
         
         .language-hint p {
@@ -253,6 +270,29 @@
             color: white;
             opacity: 0.95;
             line-height: 1.4;
+        }
+        
+        /* ============ 图片懒加载优化 ============ */
+        .lazy-image {
+            opacity: 0;
+            transition: opacity 0.3s ease-in;
+        }
+        
+        .lazy-image.loaded {
+            opacity: 1;
+        }
+        
+        /* 图片加载占位 */
+        .image-placeholder {
+            background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
+            background-size: 200% 100%;
+            animation: shine 1.5s linear infinite;
+        }
+        
+        @keyframes shine {
+            to {
+                background-position-x: -200%;
+            }
         }
         
         /* ============ 拍立得弹窗样式 ============ */
@@ -706,10 +746,12 @@
     
     <!-- 游戏容器 -->
     <div class="game-container">
-        <!-- 语言选择页面 -->
+        <!-- 语言选择页面 - 优化滚动结构 -->
         <div id="languagePage" class="page active">
-            <img id="bgImage" alt="新春背景图">
-            <!-- 规则按钮 -->
+            <!-- 背景图片使用懒加载 -->
+            <img id="bgImage" class="lazy-image" data-src="images/开屏图去水印 (1).png" alt="新春背景图">
+            
+            <!-- 规则按钮 - 固定在右上角 -->
             <button class="rules-btn" id="rulesBtn">?</button>
             
             <!-- 规则弹窗 -->
@@ -740,7 +782,7 @@
             </div>
             
             <div class="language-content">
-                <div style="margin-bottom: 30px;">
+                <div style="margin-bottom: 20px; width: 100%;">
                     <h1 class="language-title">
                         广府年味之旅
                         <span>Guangdong New Year Journey</span>
@@ -767,7 +809,7 @@
         <!-- 游戏主页面 -->
         <div id="gamePage" class="page">
             <div class="scene-area">
-                <img id="sceneImage" alt="场景图">
+                <img id="sceneImage" class="lazy-image" data-src="images/年28打扫图去水印.png" alt="场景图">
                 <div class="scene-overlay">
                     <h3 id="sceneTitle">场景标题</h3>
                     <p id="sceneText">场景描述内容...</p>
@@ -796,8 +838,8 @@
             <h2 id="endingTitle">🎊 春节旅程结束</h2>
             <img id="endingImage" alt="结局图片">
             <div class="ending-content">
-                <h3 id="endingResultTitle">本次春节成就</h3>
-                <p id="endingResultText">根据您的选择，获得了以下成就...</p>
+                <h3 id="endingResultTitle">您的春节类型</h3>
+                <p id="endingResultText">根据您的选择和表现，您的春节属于：</p>
                 
                 <div class="ending-stats" id="endingStats"></div>
                 
@@ -826,7 +868,7 @@
             <button id="homeBtn" class="action-btn">返回首页</button>
             <div class="qrcode-section">
                 <h4 id="qrcodeTitle">📱 分享游戏给朋友</h4>
-                <img id="qrcodeImg" alt="二维码">
+                <img id="qrcodeImg" class="lazy-image" data-src="images/分享二维码.png" alt="二维码">
                 <p id="qrcodeHint">扫码一起体验广府年味！</p>
             </div>
         </div>
@@ -852,79 +894,203 @@
             }
         };
 
-      // ==================== 图片配置 ====================
-const gameImages = {
-    languageBg: "images/开屏图去水印 (1).png",
-    scenes: [
-        "images/年28打扫图去水印.png",
-        "images/年30行花街图去水印 (1).png", 
-        "images/年初一团年饭图去水印.png",
-        "images/元宵节逗利是图去水印.png"
-    ],
-    // 选项结果图片 - 已更正文件名
-    optionResults: [
-        [
-            "images/擦牌位去水印.png",      // 第一场景选项1 - 打扫神台（更正）
-            "images/去霉运去水印.png",       // 第一场景选项2 - 柚叶水
-            "images/洗被褥去水印.png"        // 第一场景选项3 - 洗被褥
-        ],
-        [
-            "images/买桃花去水印.png",        // 第二场景选项1 - 买桃花
-            "images/买年桔去水印.png",        // 第二场景选项2 - 买年桔（更正）
-            "images/欣赏花去水印.png"         // 第二场景选项3 - 欣赏花（更正）
-        ],
-        [
-            "images/摆碗筷去水印.png",        // 第三场景选项1 - 摆碗筷
-            "images/包油角去水印.png",        // 第三场景选项2 - 包油角（更正）
-            "images/备盆菜去水印.png"         // 第三场景选项3 - 备盆菜
-        ],
-        [
-            "images/给利是去水印.png",        // 第四场景选项1 - 给利是
-            "images/吃点心去水印.png",        // 第四场景选项2 - 吃点心
-            "images/看舞狮去水印.png"         // 第四场景选项3 - 看舞狮
-        ]
-    ],
-    // 结局图片
-    endings: {
-        wealth: "images/财富结局去水印.png",
-        luck: "images/好运结局去水印.png",
-        happiness: "images/幸福结局去水印.png",
-        perfect: "images/完美结局去水印.png",
-        default: "images/普通结局图.png"
-    },
-    // 新年签图片
-    fortunes: [
-        {
-            image: "images/新年签马到成功图去水印.png",
-            text: {
-                zh: "马到成功，事业腾飞！新一年如骏马奔腾，勇往直前，所有目标都能顺利达成！",
-                en: "Success comes with the horse! May your career soar like a galloping steed!"
+        // ==================== 图片预加载管理器 ====================
+        const imageLoader = {
+            // 图片缓存
+            cache: new Map(),
+            
+            // 预加载关键图片
+            preloadImportantImages() {
+                const importantImages = [
+                    "images/开屏图去水印 (1).png",
+                    "images/年28打扫图去水印.png",
+                    "images/年30行花街图去水印 (1).png",
+                    "images/年初一团年饭图去水印.png",
+                    "images/元宵节逗利是图去水印.png",
+                    "images/新年签马到成功图去水印.png"
+                ];
+                
+                importantImages.forEach(src => {
+                    this.loadImage(src);
+                });
+            },
+            
+            // 加载单张图片
+            loadImage(src) {
+                if (this.cache.has(src)) {
+                    return Promise.resolve(this.cache.get(src));
+                }
+                
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        this.cache.set(src, img);
+                        resolve(img);
+                    };
+                    img.onerror = () => {
+                        console.log(`图片加载失败: ${src}`);
+                        reject(src);
+                    };
+                    img.src = src;
+                });
+            },
+            
+            // 批量加载图片
+            loadImages(srcArray) {
+                return Promise.allSettled(
+                    srcArray.map(src => this.loadImage(src))
+                );
+            },
+            
+            // 获取缓存的图片
+            getCached(src) {
+                return this.cache.get(src);
             }
-        },
-        {
-            image: "images/新年签财运亨通图去水印 (1).png",
-            text: {
-                zh: "财运亨通，利是多多！正财偏财一齐来，银行存款节节高！",
-                en: "Wealth flows freely! May prosperity find you from all directions!"
-            }
-        },
-        {
-            image: "images/新年签桃花盛开图去水印.png",
-            text: {
-                zh: "桃花盛开，姻缘美满！单身遇良缘，有情人终成眷属！",
-                en: "Love blossoms! May you find your perfect match or deepen existing bonds!"
-            }
-        },
-        {
-            image: "images/新年签家庭和睦图去水印.png",
-            text: {
-                zh: "家庭和睦，幸福安康！家人健康快乐，团圆美满！",
-                en: "Family harmony and good health! May your home be filled with joy!"
+        };
+
+        // ==================== 懒加载初始化 ====================
+        function initLazyLoading() {
+            const lazyImages = document.querySelectorAll('.lazy-image');
+            
+            if ('IntersectionObserver' in window) {
+                const imageObserver = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const img = entry.target;
+                            const src = img.dataset.src;
+                            
+                            if (src) {
+                                const cachedImg = imageLoader.getCached(src);
+                                if (cachedImg) {
+                                    img.src = cachedImg.src;
+                                    img.classList.add('loaded');
+                                } else {
+                                    imageLoader.loadImage(src).then(() => {
+                                        img.src = src;
+                                        img.classList.add('loaded');
+                                    });
+                                }
+                            }
+                            
+                            observer.unobserve(img);
+                        }
+                    });
+                }, {
+                    rootMargin: '50px 0px',
+                    threshold: 0.01
+                });
+                
+                lazyImages.forEach(img => imageObserver.observe(img));
+            } else {
+                lazyImages.forEach(img => {
+                    const src = img.dataset.src;
+                    if (src) {
+                        img.src = src;
+                        img.classList.add('loaded');
+                    }
+                });
             }
         }
-    ],
-    qrcode: "images/分享二维码.png"
-};
+
+        // ==================== 优化后的图片加载函数 ====================
+        function loadImageWithCache(src, imgElement, fallbackSrc = null) {
+            imgElement.classList.add('image-placeholder');
+            
+            const cachedImg = imageLoader.getCached(src);
+            if (cachedImg) {
+                imgElement.src = cachedImg.src;
+                imgElement.classList.remove('image-placeholder');
+                imgElement.classList.add('loaded');
+                return Promise.resolve();
+            }
+            
+            return imageLoader.loadImage(src)
+                .then(() => {
+                    imgElement.src = src;
+                    imgElement.classList.remove('image-placeholder');
+                    imgElement.classList.add('loaded');
+                })
+                .catch(() => {
+                    console.log(`使用备用图片: ${fallbackSrc || src}`);
+                    if (fallbackSrc) {
+                        imgElement.src = fallbackSrc;
+                    }
+                    imgElement.classList.remove('image-placeholder');
+                });
+        }
+
+        // ==================== 图片配置 ====================
+        const gameImages = {
+            languageBg: "images/开屏图去水印 (1).png",
+            scenes: [
+                "images/年28打扫图去水印.png",
+                "images/年30行花街图去水印 (1).png", 
+                "images/年初一团年饭图去水印.png",
+                "images/元宵节逗利是图去水印.png"
+            ],
+            // 选项结果图片 - 已更正文件名
+            optionResults: [
+                [
+                    "images/擦牌位去水印.png",      // 第一场景选项1
+                    "images/去霉运去水印.png",       // 第一场景选项2
+                    "images/洗被褥去水印.png"        // 第一场景选项3
+                ],
+                [
+                    "images/买桃花去水印.png",        // 第二场景选项1
+                    "images/买年桔去水印.png",        // 第二场景选项2
+                    "images/欣赏花去水印.png"         // 第二场景选项3
+                ],
+                [
+                    "images/摆碗筷去水印.png",        // 第三场景选项1
+                    "images/包油角去水印.png",        // 第三场景选项2
+                    "images/备盆菜去水印.png"         // 第三场景选项3
+                ],
+                [
+                    "images/给利是去水印.png",        // 第四场景选项1
+                    "images/吃点心去水印.png",        // 第四场景选项2
+                    "images/看舞狮去水印.png"         // 第四场景选项3
+                ]
+            ],
+            // 结局图片
+            endings: {
+                wealth: "images/财富结局去水印.png",
+                luck: "images/好运结局去水印.png",
+                happiness: "images/幸福结局去水印.png",
+                perfect: "images/完美结局去水印.png",
+                default: "images/普通结局图.png"
+            },
+            fortunes: [
+                {
+                    image: "images/新年签马到成功图去水印.png",
+                    text: {
+                        zh: "马到成功，事业腾飞！新一年如骏马奔腾，勇往直前，所有目标都能顺利达成！",
+                        en: "Success comes with the horse! May your career soar like a galloping steed!"
+                    }
+                },
+                {
+                    image: "images/新年签财运亨通图去水印 (1).png",
+                    text: {
+                        zh: "财运亨通，利是多多！正财偏财一齐来，银行存款节节高！",
+                        en: "Wealth flows freely! May prosperity find you from all directions!"
+                    }
+                },
+                {
+                    image: "images/新年签桃花盛开图去水印.png",
+                    text: {
+                        zh: "桃花盛开，姻缘美满！单身遇良缘，有情人终成眷属！",
+                        en: "Love blossoms! May you find your perfect match or deepen existing bonds!"
+                    }
+                },
+                {
+                    image: "images/新年签家庭和睦图去水印.png",
+                    text: {
+                        zh: "家庭和睦，幸福安康！家人健康快乐，团圆美满！",
+                        en: "Family harmony and good health! May your home be filled with joy!"
+                    }
+                }
+            ],
+            qrcode: "images/分享二维码.png"
+        };
 
         // ==================== 游戏数据 ====================
         const gameData = {
@@ -1097,7 +1263,6 @@ const gameImages = {
                         ]
                     }
                 ],
-                // 结局类型
                 endings: [
                     {
                         title: "🏮 传统温馨型",
@@ -1139,7 +1304,6 @@ const gameImages = {
                         imageType: "perfect"
                     }
                 ],
-                // 成就系统
                 achievements: [
                     { 
                         id: 1, 
@@ -1153,7 +1317,7 @@ const gameImages = {
                         name: "🌸 浪漫主义者", 
                         desc: "您选择了桃花，期待美好姻缘",
                         icon: "💕",
-                        condition: (game) => game.selectedOptions.includes('买一株桃花')
+                        condition: (game) => game.selectedOptions.some(opt => opt.includes('买一株桃花') || opt.includes('Buy peach blossoms'))
                     },
                     { 
                         id: 3, 
@@ -1190,7 +1354,7 @@ const gameImages = {
                         icon: "🍜",
                         condition: (game) => {
                             const foodItems = ['自制油角', '盆菜制作经验', '茶楼点心券'];
-                            return game.collectedItems.filter(item => foodItems.includes(item)).length >= 2;
+                            return game.collectedItems.filter(item => foodItems.some(food => item.includes(food))).length >= 2;
                         }
                     },
                     { 
@@ -1371,7 +1535,6 @@ const gameImages = {
                         ]
                     }
                 ],
-                // 结局类型
                 endings: [
                     {
                         title: "🏮 Traditional & Warm",
@@ -1413,7 +1576,6 @@ const gameImages = {
                         imageType: "perfect"
                     }
                 ],
-                // 成就系统
                 achievements: [
                     { 
                         id: 1, 
@@ -1427,7 +1589,7 @@ const gameImages = {
                         name: "🌸 Romantic Soul", 
                         desc: "You chose peach blossoms for love luck",
                         icon: "💕",
-                        condition: (game) => game.selectedOptions.includes('Buy peach blossoms')
+                        condition: (game) => game.selectedOptions.some(opt => opt.includes('Buy peach blossoms'))
                     },
                     { 
                         id: 3, 
@@ -1464,7 +1626,7 @@ const gameImages = {
                         icon: "🍜",
                         condition: (game) => {
                             const foodItems = ['Homemade Dumplings', 'Poon Choi Experience', 'Tea House Voucher'];
-                            return game.collectedItems.filter(item => foodItems.includes(item)).length >= 2;
+                            return game.collectedItems.filter(item => foodItems.some(food => item.includes(food))).length >= 2;
                         }
                     },
                     { 
@@ -1482,34 +1644,41 @@ const gameImages = {
         function init() {
             console.log("游戏初始化...");
             
+            imageLoader.preloadImportantImages();
+            initLazyLoading();
+            
             const bgImg = document.getElementById('bgImage');
-            bgImg.src = gameImages.languageBg;
-            bgImg.onerror = function() {
-                console.log("背景图加载失败，使用喜庆背景");
-                document.getElementById('languagePage').style.background = 'linear-gradient(135deg, #c1272d 0%, #ff6b6b 100%)';
-                bgImg.style.display = 'none';
-            };
+            if (bgImg) {
+                loadImageWithCache(gameImages.languageBg, bgImg)
+                    .catch(() => {
+                        document.getElementById('languagePage').style.background = 'linear-gradient(135deg, #c1272d 0%, #ff6b6b 100%)';
+                        bgImg.style.display = 'none';
+                    });
+            }
             
             const qrImg = document.getElementById('qrcodeImg');
-            qrImg.src = gameImages.qrcode;
-            qrImg.onerror = function() {
-                console.log("二维码加载失败");
-                qrImg.parentNode.innerHTML = '<div style="font-size: 60px; color: #c1272d; text-align:center;">📱</div>';
-            };
+            if (qrImg) {
+                qrImg.src = gameImages.qrcode;
+                qrImg.onerror = function() {
+                    console.log("二维码加载失败");
+                    qrImg.parentNode.innerHTML = '<div style="font-size: 60px; color: #c1272d; text-align:center;">📱</div>';
+                };
+            }
             
-            document.getElementById('chineseBtn').addEventListener('click', function() {
-                startGame('zh');
-            });
+            bindEvents();
+            console.log("初始化完成");
+        }
+
+        // ==================== 绑定事件 ====================
+        function bindEvents() {
+            document.getElementById('chineseBtn').addEventListener('click', () => startGame('zh'));
+            document.getElementById('englishBtn').addEventListener('click', () => startGame('en'));
             
-            document.getElementById('englishBtn').addEventListener('click', function() {
-                startGame('en');
-            });
-            
-            document.getElementById('rulesBtn').addEventListener('click', function() {
+            document.getElementById('rulesBtn').addEventListener('click', () => {
                 document.getElementById('rulesModal').classList.add('active');
             });
             
-            document.getElementById('rulesClose').addEventListener('click', function() {
+            document.getElementById('rulesClose').addEventListener('click', () => {
                 document.getElementById('rulesModal').classList.remove('active');
             });
             
@@ -1522,7 +1691,11 @@ const gameImages = {
                 this.classList.remove('active');
             });
             
-            console.log("初始化完成");
+            document.getElementById('rulesModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                }
+            });
         }
 
         // ==================== 开始游戏 ====================
@@ -1563,7 +1736,8 @@ const gameImages = {
             document.getElementById('moneyLabel').textContent = langData.moneyLabel;
             
             document.getElementById('endingTitle').textContent = langData.endingTitle;
-            document.getElementById('endingResultTitle').textContent = game.language === 'zh' ? '本次春节成就' : 'This Playthrough Achievements';
+            document.getElementById('endingResultTitle').textContent = game.language === 'zh' ? '您的春节类型' : 'Your New Year Type';
+            document.getElementById('endingResultText').textContent = game.language === 'zh' ? '根据您的选择和表现，您的春节属于：' : 'Based on your choices, your New Year celebration is:';
             
             document.getElementById('fortuneTitle').textContent = langData.fortuneTitle;
             document.getElementById('shareBtn').textContent = langData.shareText;
@@ -1612,12 +1786,7 @@ const gameImages = {
             
             const sceneImg = document.getElementById('sceneImage');
             if (game.currentScene < gameImages.scenes.length) {
-                sceneImg.src = gameImages.scenes[game.currentScene];
-                sceneImg.onerror = function() {
-                    console.log("场景图加载失败");
-                    sceneImg.style.display = 'none';
-                };
-                sceneImg.style.display = 'block';
+                loadImageWithCache(gameImages.scenes[game.currentScene], sceneImg);
             }
             
             const optionsArea = document.getElementById('optionsArea');
@@ -1630,7 +1799,12 @@ const gameImages = {
                 
                 button.addEventListener('click', function() {
                     game.lastOptionResult = option;
-                    const optionText = option.text.replace(/[🧹🍃🎍🌸🍊🚶🥢🎁🍲🏡🏮🦁]/g, '').trim();
+                    
+                    let optionText = option.text;
+                    optionText = optionText.replace(/[🧹🍃🧺🌸🍊🚶🥢🎁🍲🏡🏮🦁]/g, '').trim();
+                    optionText = optionText.replace(/\(¥\d+\)/g, '').trim();
+                    optionText = optionText.replace(/\(\$\d+\)/g, '').trim();
+                    
                     game.selectedOptions.push(optionText);
                     
                     if (option.choiceType && game.choiceTypes[option.choiceType] !== undefined) {
@@ -1661,104 +1835,60 @@ const gameImages = {
             updateStatus();
         }
 
-      // ==================== 显示拍立得弹窗 ====================
-function showPolaroidModal(option) {
-    const modal = document.getElementById('polaroidModal');
-    const polaroidImage = document.getElementById('polaroidImage');
-    const polaroidDesc = document.getElementById('polaroidDesc');
-    const polaroidStats = document.getElementById('polaroidStats');
-    const polaroidCollect = document.getElementById('polaroidCollect');
-    
-    // 设置拍立得图片 - 使用您提供的选项反馈图片
-    if (game.currentScene < gameImages.optionResults.length) {
-        const sceneImages = gameImages.optionResults[game.currentScene];
-        if (option.imageIndex !== undefined && option.imageIndex < sceneImages.length) {
-            // 设置图片路径
-            polaroidImage.src = sceneImages[option.imageIndex];
+        // ==================== 显示拍立得弹窗 ====================
+        function showPolaroidModal(option) {
+            const modal = document.getElementById('polaroidModal');
+            const polaroidImage = document.getElementById('polaroidImage');
+            const polaroidDesc = document.getElementById('polaroidDesc');
+            const polaroidStats = document.getElementById('polaroidStats');
+            const polaroidCollect = document.getElementById('polaroidCollect');
             
-            // 添加图片加载失败的回调
-            polaroidImage.onerror = function() {
-                console.log(`选项图片加载失败: ${sceneImages[option.imageIndex]}`);
-                // 如果加载失败，使用场景图作为备用
-                if (game.currentScene < gameImages.scenes.length) {
-                    polaroidImage.src = gameImages.scenes[game.currentScene];
+            if (game.currentScene < gameImages.optionResults.length) {
+                const sceneImages = gameImages.optionResults[game.currentScene];
+                if (option.imageIndex !== undefined && option.imageIndex < sceneImages.length) {
+                    const fallbackSrc = gameImages.scenes[game.currentScene];
+                    loadImageWithCache(sceneImages[option.imageIndex], polaroidImage, fallbackSrc);
                 } else {
-                    // 如果连场景图都没有，显示一个喜庆的纯色背景
-                    polaroidImage.style.display = 'none';
-                    const polaroid = document.querySelector('.polaroid');
-                    if (polaroid) {
-                        polaroid.style.background = 'linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%)';
-                    }
+                    polaroidImage.src = gameImages.scenes[game.currentScene];
                 }
-            };
+            } else {
+                polaroidImage.src = gameImages.scenes[game.currentScene];
+            }
             
-            // 添加图片加载成功的回调
-            polaroidImage.onload = function() {
-                console.log(`选项图片加载成功: ${sceneImages[option.imageIndex]}`);
-                polaroidImage.style.display = 'block';
-            };
-        } else {
-            polaroidImage.src = gameImages.scenes[game.currentScene];
+            polaroidDesc.textContent = option.result;
+            
+            let statsHTML = '';
+            if (option.luck) {
+                statsHTML += `<div class="stat-item"><div class="stat-value">${option.luck > 0 ? '+' : ''}${option.luck}</div><div class="stat-label">${game.language === 'zh' ? '好运值' : 'Luck'}</div></div>`;
+            }
+            if (option.money) {
+                const moneyText = game.language === 'zh' ? `¥${option.money > 0 ? '+' : ''}${option.money}` : `$${option.money > 0 ? '+' : ''}${option.money}`;
+                statsHTML += `<div class="stat-item"><div class="stat-value">${moneyText}</div><div class="stat-label">${game.language === 'zh' ? '利是钱' : 'Money'}</div></div>`;
+            }
+            if (option.happiness) {
+                statsHTML += `<div class="stat-item"><div class="stat-value">${option.happiness > 0 ? '+' : ''}${option.happiness}</div><div class="stat-label">${game.language === 'zh' ? '幸福度' : 'Happiness'}</div></div>`;
+            }
+            
+            polaroidStats.innerHTML = statsHTML;
+            
+            if (option.collect) {
+                polaroidCollect.textContent = `${game.language === 'zh' ? '收集到：' : 'Collected: '}${option.collect}`;
+                polaroidCollect.style.display = 'block';
+            } else {
+                polaroidCollect.style.display = 'none';
+            }
+            
+            modal.classList.add('active');
+            
+            setTimeout(() => {
+                game.currentScene++;
+                if (game.currentScene < gameData[game.language].scenes.length) {
+                    loadScene();
+                } else {
+                    setTimeout(showEndingPage, 500);
+                }
+            }, 1500);
         }
-    } else {
-        polaroidImage.src = gameImages.scenes[game.currentScene];
-    }
-    
-    // 设置描述
-    polaroidDesc.textContent = option.result;
-    
-    // 设置统计数据
-    let statsHTML = '';
-    if (option.luck) {
-        statsHTML += `
-            <div class="stat-item">
-                <div class="stat-value">${option.luck > 0 ? '+' : ''}${option.luck}</div>
-                <div class="stat-label">${game.language === 'zh' ? '好运值' : 'Luck'}</div>
-            </div>
-        `;
-    }
-    if (option.money) {
-        const moneyText = game.language === 'zh' ? `¥${option.money > 0 ? '+' : ''}${option.money}` : `$${option.money > 0 ? '+' : ''}${option.money}`;
-        statsHTML += `
-            <div class="stat-item">
-                <div class="stat-value">${moneyText}</div>
-                <div class="stat-label">${game.language === 'zh' ? '利是钱' : 'Money'}</div>
-            </div>
-        `;
-    }
-    if (option.happiness) {
-        statsHTML += `
-            <div class="stat-item">
-                <div class="stat-value">${option.happiness > 0 ? '+' : ''}${option.happiness}</div>
-                <div class="stat-label">${game.language === 'zh' ? '幸福度' : 'Happiness'}</div>
-            </div>
-        `;
-    }
-    
-    polaroidStats.innerHTML = statsHTML;
-    
-    // 设置收集物品
-    if (option.collect) {
-        polaroidCollect.textContent = `${game.language === 'zh' ? '收集到：' : 'Collected: '}${option.collect}`;
-        polaroidCollect.style.display = 'block';
-    } else {
-        polaroidCollect.style.display = 'none';
-    }
-    
-    // 显示弹窗
-    modal.classList.add('active');
-    
-    // 延迟进入下一个场景
-    setTimeout(() => {
-        game.currentScene++;
-        if (game.currentScene < gameData[game.language].scenes.length) {
-            loadScene();
-        } else {
-            // 所有场景完成，显示结局
-            setTimeout(showEndingPage, 500);
-        }
-    }, 1500);
-}
 
         // ==================== 显示结局页面 ====================
         function showEndingPage() {
@@ -1771,16 +1901,12 @@ function showPolaroidModal(option) {
             
             const ending = determineEndingType();
             
-            // 设置结局图片 - 使用您提供的结局图片
             const endingImg = document.getElementById('endingImage');
             if (ending && ending.imageType && gameImages.endings[ending.imageType]) {
                 endingImg.src = gameImages.endings[ending.imageType];
             } else {
                 endingImg.src = gameImages.endings.default;
             }
-            
-            document.getElementById('endingResultTitle').textContent = game.language === 'zh' ? '您的春节类型' : 'Your New Year Type';
-            document.getElementById('endingResultText').textContent = game.language === 'zh' ? '根据您的选择和表现，您的春节属于：' : 'Based on your choices, your New Year celebration is:';
             
             document.getElementById('endingTypeTitle').textContent = ending.title;
             document.getElementById('endingTypeDesc').textContent = ending.desc;
@@ -1831,16 +1957,14 @@ function showPolaroidModal(option) {
             } else {
                 achievementList.innerHTML = `
                     <div class="no-achievement">
-                        ${game.language === 'zh' ? 
-                            '这次没有获得特殊成就，下次试试不同的选择吧！' : 
-                            'No special achievements this time. Try different choices next time!'}
+                        ${game.language === 'zh' ? '这次没有获得特殊成就，下次试试不同的选择吧！' : 'No special achievements this time. Try different choices next time!'}
                     </div>
                 `;
             }
             
             const conclusionText = game.language === 'zh' 
-                ? `点击下方按钮抽取您的新年好运签！` 
-                : `Click below to draw your New Year fortune!`;
+                ? '点击下方按钮抽取您的新年好运签！' 
+                : 'Click below to draw your New Year fortune!';
             
             document.getElementById('endingConclusion').textContent = conclusionText;
         }
@@ -1982,5 +2106,3 @@ function showPolaroidModal(option) {
     </script>
 </body>
 </html>
-
-
