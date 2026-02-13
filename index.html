@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
     <title>广府年味之旅 | Guangdong New Year Journey</title>
     <style>
         /* 基础样式 */
@@ -51,6 +51,8 @@
         #languagePage {
             position: relative;
             background: linear-gradient(135deg, #c1272d 0%, #ff6b6b 100%);
+            overflow-y: auto;  /* 允许整个页面滚动 */
+            -webkit-overflow-scrolling: touch;
         }
         
         #bgImage {
@@ -59,19 +61,20 @@
             object-fit: cover;
             filter: brightness(1) !important;
             opacity: 1 !important;
+            position: absolute;
+            z-index: 0;
         }
         
         .language-content {
-            position: absolute;
-            top: 0;
-            left: 0;
+            position: relative;  /* 改为相对定位，跟随滚动 */
+            z-index: 2;
             width: 100%;
-            height: 100%;
+            min-height: 100%;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 30px;
+            padding: 60px 30px 80px;
             text-align: center;
             background: linear-gradient(
                 180deg, 
@@ -79,6 +82,7 @@
                 rgba(255, 107, 107, 0.2) 50%,
                 rgba(193, 39, 45, 0.3) 100%
             );
+            backdrop-filter: brightness(1.05);
         }
         
         /* 规则按钮 */
@@ -95,7 +99,7 @@
             font-size: 20px;
             font-weight: bold;
             cursor: pointer;
-            z-index: 10;
+            z-index: 20;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -253,6 +257,25 @@
             color: white;
             opacity: 0.95;
             line-height: 1.4;
+        }
+        
+        /* 拖动条提示 (视觉增强) */
+        .scroll-indicator {
+            margin-top: 15px;
+            color: white;
+            font-size: 14px;
+            background: rgba(0,0,0,0.3);
+            padding: 8px 16px;
+            border-radius: 30px;
+            border: 1px solid rgba(255,215,0,0.7);
+            backdrop-filter: blur(4px);
+            display: inline-block;
+            animation: bounce 1.5s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(5px); }
         }
         
         /* ============ 拍立得弹窗样式 ============ */
@@ -685,6 +708,21 @@
             display: block;
             border: 2px solid #ff9a9e;
         }
+
+        #message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 30px;
+            z-index: 2000;
+            display: none;
+            font-size: 16px;
+            border: 2px solid #ffd700;
+        }
     </style>
 </head>
 <body>
@@ -760,6 +798,11 @@
                 <div class="language-hint">
                     <p>🐴 马年特别版 🎉</p>
                     <span>从年廿八到元宵节，体验完整广东年俗</span>
+                </div>
+                
+                <!-- 新增的拖动提示条，方便所有机型阅读 -->
+                <div class="scroll-indicator">
+                    ⬆️⬇️ 上下拖动浏览 ⬆️⬇️
                 </div>
             </div>
         </div>
@@ -884,12 +927,14 @@ const gameImages = {
             "images/看舞狮去水印.png"         // 第四场景选项3 - 看舞狮
         ]
     ],
-    // 结局图片
+    // 结局图片 - 新增传统结局、社交结局
     endings: {
         wealth: "images/财富结局去水印.png",
         luck: "images/好运结局去水印.png",
         happiness: "images/幸福结局去水印.png",
         perfect: "images/完美结局去水印.png",
+        traditional: "images/传统结局去水印.png",   // 新增传统结局图
+        social: "images/社交结局去水印.png",         // 新增社交结局图
         default: "images/普通结局图.png"
     },
     // 新年签图片
@@ -1097,13 +1142,13 @@ const gameImages = {
                         ]
                     }
                 ],
-                // 结局类型
+                // 结局类型 - 已加入传统型和社交型，对应新图片
                 endings: [
                     {
                         title: "🏮 传统温馨型",
                         desc: "您选择了传统的春节习俗，注重家庭团聚和传统仪式。您的春节充满了温馨的家庭氛围和浓郁的传统气息。",
                         condition: (game) => game.choiceTypes.traditional >= 2 && game.choiceTypes.family >= 2,
-                        imageType: "perfect"
+                        imageType: "traditional"   // 指向传统结局图
                     },
                     {
                         title: "💰 财运亨通型",
@@ -1121,7 +1166,7 @@ const gameImages = {
                         title: "🎉 社交达人型",
                         desc: "您积极参与各种社交活动，体验了丰富多彩的春节氛围。您的春节充满了欢乐和人气！",
                         condition: (game) => game.choiceTypes.social >= 2,
-                        imageType: "happiness"
+                        imageType: "social"    // 指向社交结局图
                     },
                     {
                         title: "😊 幸福美满型",
@@ -1371,13 +1416,13 @@ const gameImages = {
                         ]
                     }
                 ],
-                // 结局类型
+                // 结局类型 (英文版也加入传统/社交结局对应)
                 endings: [
                     {
                         title: "🏮 Traditional & Warm",
                         desc: "You followed traditional New Year customs, focusing on family reunions. Your celebration was filled with warmth and tradition.",
                         condition: (game) => game.choiceTypes.traditional >= 2 && game.choiceTypes.family >= 2,
-                        imageType: "perfect"
+                        imageType: "traditional"
                     },
                     {
                         title: "💰 Wealth & Prosperity",
@@ -1395,7 +1440,7 @@ const gameImages = {
                         title: "🎉 Social Butterfly",
                         desc: "You actively participated in social activities, experiencing diverse festive atmosphere. Your New Year was joyful!",
                         condition: (game) => game.choiceTypes.social >= 2,
-                        imageType: "happiness"
+                        imageType: "social"
                     },
                     {
                         title: "😊 Happiness & Joy",
@@ -1413,7 +1458,7 @@ const gameImages = {
                         imageType: "perfect"
                     }
                 ],
-                // 成就系统
+                // 成就系统 (英文)
                 achievements: [
                     { 
                         id: 1, 
@@ -1463,7 +1508,7 @@ const gameImages = {
                         desc: "You participated in various food preparations",
                         icon: "🍜",
                         condition: (game) => {
-                            const foodItems = ['Homemade Dumplings', 'Poon Choi Experience', 'Tea House Voucher'];
+                            const foodItems = ['Homemade Yau Gok (Crispy Pastry Dumpling)', 'Poon Choi (Big Bowl Feast) Experience', 'Tea House Voucher'];
                             return game.collectedItems.filter(item => foodItems.includes(item)).length >= 2;
                         }
                     },
@@ -1771,7 +1816,7 @@ function showPolaroidModal(option) {
             
             const ending = determineEndingType();
             
-            // 设置结局图片 - 使用您提供的结局图片
+            // 设置结局图片 - 使用您提供的结局图片，现在包含传统/社交图
             const endingImg = document.getElementById('endingImage');
             if (ending && ending.imageType && gameImages.endings[ending.imageType]) {
                 endingImg.src = gameImages.endings[ending.imageType];
@@ -1982,4 +2027,3 @@ function showPolaroidModal(option) {
     </script>
 </body>
 </html>
-
