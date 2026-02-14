@@ -763,6 +763,43 @@
             font-size: 16px;
             border: 2px solid #ffd700;
         }
+        /* ============ BGM 控制按钮样式 ============ */
+.bgm-btn {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 215, 0, 0.9);
+    border: 2px solid #c1272d;
+    border-radius: 50%;
+    color: #c1272d;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+}
+
+.bgm-btn.muted {
+    background: rgba(200, 200, 200, 0.9);
+    color: #666;
+    border-color: #666;
+}
+
+.bgm-btn.muted::after {
+    content: "";
+    position: absolute;
+    width: 2px;
+    height: 24px;
+    background: #666;
+    transform: rotate(45deg);
+    border-radius: 2px;
+}
     </style>
 </head>
 <body>
@@ -784,6 +821,14 @@
     
     <!-- 游戏容器 -->
     <div class="game-container">
+        <!-- BGM 控制按钮 - 固定在游戏容器左上角 -->
+<button id="bgmToggle" class="bgm-btn">🎵</button>
+
+<!-- 隐藏的音频元素 -->
+<audio id="bgmAudio" loop preload="auto">
+    <source src="images/bgm.mp3" type="audio/mpeg">
+    您的浏览器不支持音频元素
+</audio>
         <!-- 语言选择页面 - 重构背景结构，保证滚动时图片完整跟随 -->
         <div id="languagePage" class="page active">
             <!-- 背景独立包装：绝对定位，但高度随内容撑开，保证滚动到底部仍有背景 -->
@@ -929,7 +974,101 @@
                 social: 0
             }
         };
+// ==================== BGM 控制 ====================
+const bgmConfig = {
+    audio: null,
+    isMuted: false,
+    isPlaying: false,
+    userInteracted: false
+};
 
+// 初始化 BGM
+function initBGM() {
+    bgmConfig.audio = document.getElementById('bgmAudio');
+    const bgmBtn = document.getElementById('bgmToggle');
+    
+    if (!bgmConfig.audio || !bgmBtn) return;
+    
+    // 设置初始音量
+    bgmConfig.audio.volume = 0.5;
+    
+    // 尝试自动播放
+    const playPromise = bgmConfig.audio.play();
+    
+    if (playPromise !== undefined) {
+        playPromise.then(() => {
+            console.log('BGM 自动播放成功');
+            bgmConfig.isPlaying = true;
+            bgmConfig.userInteracted = true;
+            bgmBtn.classList.remove('muted');
+        }).catch(error => {
+            console.log('BGM 自动播放被阻止，等待用户交互:', error);
+            // 等待用户点击页面任意位置后播放
+            const startAudio = function() {
+                if (!bgmConfig.isPlaying) {
+                    bgmConfig.audio.play().then(() => {
+                        bgmConfig.isPlaying = true;
+                        bgmConfig.userInteracted = true;
+                        bgmBtn.classList.remove('muted');
+                        document.removeEventListener('click', startAudio);
+                        document.removeEventListener('touchstart', startAudio);
+                        console.log('用户交互后 BGM 开始播放');
+                    }).catch(e => console.log('仍然无法播放:', e));
+                }
+            };
+            
+            // 监听用户交互事件
+            document.addEventListener('click', startAudio, { once: true });
+            document.addEventListener('touchstart', startAudio, { once: true });
+        });
+    }
+    
+    // BGM 按钮点击事件 - 静音/取消静音
+    bgmBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        
+        if (!bgmConfig.audio) return;
+        
+        if (bgmConfig.isMuted) {
+            // 取消静音
+            bgmConfig.audio.muted = false;
+            bgmConfig.isMuted = false;
+            bgmBtn.classList.remove('muted');
+            bgmBtn.innerHTML = '🎵';
+            
+            // 如果没在播放，尝试播放
+            if (!bgmConfig.isPlaying) {
+                bgmConfig.audio.play().then(() => {
+                    bgmConfig.isPlaying = true;
+                }).catch(e => console.log('播放失败:', e));
+            }
+        } else {
+            // 静音
+            bgmConfig.audio.muted = true;
+            bgmConfig.isMuted = true;
+            bgmBtn.classList.add('muted');
+            bgmBtn.innerHTML = '🔇';
+        }
+        
+        console.log('BGM 静音状态:', bgmConfig.isMuted);
+    });
+    
+    // 处理页面可见性变化（当用户切换标签页再回来时继续播放）
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden && bgmConfig.userInteracted && !bgmConfig.isMuted && !bgmConfig.isPlaying) {
+            bgmConfig.audio.play().then(() => {
+                bgmConfig.isPlaying = true;
+            }).catch(e => console.log('恢复播放失败:', e));
+        }
+    });
+    
+    // 处理页面卸载时暂停
+    window.addEventListener('beforeunload', function() {
+        if (bgmConfig.audio && bgmConfig.isPlaying) {
+            bgmConfig.audio.pause();
+        }
+    });
+}
        // ==================== 图片配置 ====================
         const gameImages = {
             languageBg: "images/开屏图去水印 (1).png",
@@ -1672,7 +1811,8 @@ function init() {
     document.getElementById('polaroidModal').addEventListener('click', function() {
         this.classList.remove('active');
     });
-    
+    // 初始化 BGM
+initBGM();
     console.log("初始化完成 - 背景图强制覆盖模式已启用");
 }
 
@@ -1697,6 +1837,11 @@ function init() {
             document.getElementById('fortunePage').classList.remove('active');
             
             loadScene();
+            // 确保 BGM 按钮在游戏页面仍然可见
+const bgmBtn = document.getElementById('bgmToggle');
+if (bgmBtn) {
+    bgmBtn.style.zIndex = '1000';
+}
         }
 
         // ==================== 更新界面语言 ====================
@@ -1947,6 +2092,7 @@ function init() {
     </script>
 </body>
 </html>
+
 
 
 
