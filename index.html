@@ -748,7 +748,7 @@
             border: 2px solid #ffd700;
         }
         
-        /* BGM 控制按钮样式 - 优化版 */
+        /* BGM 控制按钮样式 */
         .bgm-btn {
             position: absolute;
             top: 15px;
@@ -984,11 +984,51 @@
             audio: null,
             isMuted: false,  // 初始为非静音状态
             isPlaying: false,
-            playAttempts: 0,
-            userInteracted: false
+            playAttempts: 0
         };
 
-        // 初始化 BGM - 强制自动播放
+        // 统一的播放函数 - 可以在任何用户交互时调用
+        function playBGM() {
+            if (!bgmConfig.audio) {
+                bgmConfig.audio = document.getElementById('bgmAudio');
+            }
+            
+            if (!bgmConfig.audio) return Promise.reject('音频元素不存在');
+            
+            // 如果已经在播放且非静音，就不重复播放
+            if (bgmConfig.isPlaying && !bgmConfig.audio.paused && !bgmConfig.isMuted) {
+                return Promise.resolve();
+            }
+            
+            // 确保不是静音状态
+            bgmConfig.audio.muted = bgmConfig.isMuted;
+            
+            // 尝试播放
+            return bgmConfig.audio.play()
+                .then(() => {
+                    console.log('✅ BGM 播放成功');
+                    bgmConfig.isPlaying = true;
+                    
+                    // 更新按钮样式
+                    const bgmBtn = document.getElementById('bgmToggle');
+                    if (bgmBtn) {
+                        if (bgmConfig.isMuted) {
+                            bgmBtn.classList.add('muted');
+                            bgmBtn.innerHTML = '🔇';
+                        } else {
+                            bgmBtn.classList.remove('muted');
+                            bgmBtn.innerHTML = '🎵';
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.log('❌ BGM 播放失败:', error);
+                    bgmConfig.playAttempts++;
+                    return Promise.reject(error);
+                });
+        }
+
+        // 初始化 BGM
         function initBGM() {
             bgmConfig.audio = document.getElementById('bgmAudio');
             const bgmBtn = document.getElementById('bgmToggle');
@@ -1005,68 +1045,14 @@
             // 预加载音频
             bgmConfig.audio.load();
             
-            // === 方案1: 立即尝试播放 ===
-            function attemptPlay() {
-                if (bgmConfig.isPlaying) return;
-                
-                bgmConfig.audio.play()
-                    .then(() => {
-                        console.log('✅ BGM 自动播放成功');
-                        bgmConfig.isPlaying = true;
-                        // 确保不是静音状态
-                        bgmConfig.audio.muted = false;
-                        bgmConfig.isMuted = false;
-                        bgmBtn.classList.remove('muted');
-                        bgmBtn.innerHTML = '🎵';
-                    })
-                    .catch(error => {
-                        console.log('❌ BGM 自动播放失败:', error);
-                        bgmConfig.playAttempts++;
-                        
-                        // 方案2: 等待用户首次交互时播放
-                        if (bgmConfig.playAttempts === 1) {
-                            setupUserInteractionListeners();
-                        }
-                    });
-            }
-            
-            // === 方案2: 监听用户首次交互 ===
-            function setupUserInteractionListeners() {
-                const events = ['click', 'touchstart', 'keydown', 'scroll'];
-                
-                function onUserInteraction() {
-                    // 移除所有监听器
-                    events.forEach(event => {
-                        document.removeEventListener(event, onUserInteraction);
-                    });
-                    
-                    // 尝试播放
-                    bgmConfig.audio.play()
-                        .then(() => {
-                            console.log('✅ 用户交互后 BGM 播放成功');
-                            bgmConfig.isPlaying = true;
-                            bgmConfig.audio.muted = false;
-                            bgmConfig.isMuted = false;
-                            bgmBtn.classList.remove('muted');
-                            bgmBtn.innerHTML = '🎵';
-                        })
-                        .catch(e => console.log('用户交互后播放仍然失败:', e));
-                }
-                
-                events.forEach(event => {
-                    document.addEventListener(event, onUserInteraction, { once: true });
+            // 尝试自动播放
+            setTimeout(() => {
+                playBGM().catch(() => {
+                    console.log('自动播放失败，等待用户交互');
                 });
-            }
+            }, 500);
             
-            // 立即尝试播放
-            attemptPlay();
-            
-            // 方案3: 延迟重试（针对某些浏览器）
-            setTimeout(attemptPlay, 500);
-            setTimeout(attemptPlay, 1000);
-            setTimeout(attemptPlay, 2000);
-            
-            // === BGM 按钮点击事件 - 只控制静音/取消静音 ===
+            // BGM 按钮点击事件 - 切换静音状态
             bgmBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 e.preventDefault();
@@ -1086,22 +1072,18 @@
                     bgmBtn.innerHTML = '🎵';
                     
                     // 如果没在播放，尝试播放
-                    if (!bgmConfig.isPlaying) {
-                        bgmConfig.audio.play()
-                            .then(() => {
-                                bgmConfig.isPlaying = true;
-                            })
-                            .catch(e => console.log('取消静音后播放失败:', e));
+                    if (!bgmConfig.isPlaying || bgmConfig.audio.paused) {
+                        playBGM();
                     }
                 }
                 
                 console.log('BGM 静音状态:', bgmConfig.isMuted);
             });
             
-            // 处理页面可见性变化 - 当页面重新可见时尝试恢复播放
+            // 处理页面可见性变化
             document.addEventListener('visibilitychange', function() {
-                if (!document.hidden && bgmConfig.isPlaying && !bgmConfig.isMuted) {
-                    bgmConfig.audio.play().catch(e => console.log('恢复播放失败:', e));
+                if (!document.hidden && !bgmConfig.isMuted && bgmConfig.audio.paused) {
+                    playBGM().catch(e => console.log('恢复播放失败:', e));
                 }
             });
         }
@@ -1778,12 +1760,26 @@
             // 设置所有图片的错误处理
             setupImageErrorHandling();
             
-            // 事件监听
-            document.getElementById('chineseBtn').addEventListener('click', function() {
+            // 获取语言按钮
+            const chineseBtn = document.getElementById('chineseBtn');
+            const englishBtn = document.getElementById('englishBtn');
+            
+            // 为语言按钮添加点击事件 - 同时播放BGM
+            chineseBtn.addEventListener('click', function(e) {
+                // 先播放BGM
+                playBGM().catch(() => {
+                    console.log('中文按钮点击后播放BGM失败');
+                });
+                // 然后开始游戏
                 startGame('zh');
             });
             
-            document.getElementById('englishBtn').addEventListener('click', function() {
+            englishBtn.addEventListener('click', function(e) {
+                // 先播放BGM
+                playBGM().catch(() => {
+                    console.log('英文按钮点击后播放BGM失败');
+                });
+                // 然后开始游戏
                 startGame('en');
             });
             
@@ -1804,10 +1800,17 @@
                 this.classList.remove('active');
             });
             
-            // 初始化 BGM - 放在最后，确保所有元素都准备好了
+            // 初始化 BGM
             setTimeout(() => {
                 initBGM();
             }, 100);
+            
+            // 尝试在页面任何地方点击时播放BGM（除了特定按钮）
+            document.body.addEventListener('click', function bgmOnAnyClick() {
+                playBGM().catch(() => {});
+                // 只触发一次后就移除
+                document.body.removeEventListener('click', bgmOnAnyClick);
+            }, { once: true });
             
             console.log("初始化完成");
         }
