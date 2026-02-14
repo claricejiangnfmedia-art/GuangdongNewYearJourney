@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-    <title>广府年味之旅 | Guangdong New Year Journey</title>
+    <title>广府年味之旅 | A Chinese New Year Journey in Guangdong</title>
     <style>
         /* 基础样式 */
         * {
@@ -857,7 +857,7 @@
                     <p class="rules-text">最后，您将抽取专属的新年好运签！</p>
                     
                     <h3 class="rules-title">📝 Game Rules</h3>
-                    <p class="rules-text english">Welcome to Guangdong New Year Journey! You will experience all the local traditional Chinese New Year customs.</p>
+                    <p class="rules-text english">Welcome to "A Chinese New Year Journey in Guangdong"! You will experience all the local traditional Chinese New Year customs.</p>
                     <p class="rules-text english">Each scene offers different choices that affect:</p>
                     <p class="rules-text english">✨ <strong>Luck Points</strong>: Affect fortune quality</p>
                     <p class="rules-text english">💰 <strong>Red Packets</strong>: Money received during Chinese New Year</p>
@@ -875,13 +875,13 @@
                 <div style="margin-bottom: 30px;">
                     <h1 class="language-title">
                         广府年味之旅
-                        <span>Guangdong New Year Journey</span>
+                        <span>A Chinese New Year Journey in Guangdong</span>
                     </h1>
                 </div>
                 
                 <p class="language-subtitle">
                     体验广东春节传统习俗<br>
-                    Experience Cantonese New Year Traditions
+                   Experience the Cantonese-style Chinese New Year Tradition
                 </p>
                 
                 <div class="language-buttons">
@@ -1158,7 +1158,10 @@
                     }
                 }
             ],
-            qrcode: "images/分享二维码.png"
+            // 在 gameImages 对象中添加
+qrcode: "images/分享二维码.png",
+// 添加这行：
+poster: "images/海报.jpg"
         };
 
         // ==================== 游戏数据 ====================
@@ -1436,7 +1439,7 @@
                 ]
             },
             en: {
-                languageTitle: "Guangdong New Year Journey",
+                languageTitle: "A Chinese New Year Journey in Guangdong",
                 languageSubtitle: "Experience the Cantonese-style New Year Traditions",
                 days: ["Feb 15", "New Year's Eve", "New Year's Day", "Lantern Festival"],
                 dayLabel: "Current Day",
@@ -2042,12 +2045,181 @@
             fortuneText.textContent = game.language === 'zh' ? fortune.text.zh : fortune.text.en;
         }
 
-        function shareFortune() {
-            const fortuneText = document.getElementById('fortuneText').textContent;
-            const shareMsg = game.language === 'zh' ? `🐴 我在《广府年味之旅》抽到马年好运签：${fortuneText}\n\n快来扫码一起体验广东春节习俗吧！` : `🐎 My Year of the Horse fortune: "${fortuneText}"\n\nScan to play Guangdong New Year Journey!`;
-            if (navigator.share) navigator.share({ title: game.language === 'zh' ? '广府年味之旅' : 'Guangdong New Year Journey', text: shareMsg });
-            else navigator.clipboard.writeText(shareMsg).then(() => showMessage(game.language === 'zh' ? '已复制到剪贴板' : 'Copied to clipboard'));
+        // ==================== 分享海报功能 ====================
+function shareFortune() {
+    // 创建弹窗容器
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.95);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+        flex-direction: column;
+        padding: 20px;
+        box-sizing: border-box;
+    `;
+    
+    // 创建海报容器
+    const posterContainer = document.createElement('div');
+    posterContainer.style.cssText = `
+        max-width: 100%;
+        max-height: 70vh;
+        text-align: center;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    `;
+    
+    // 创建海报图片
+    const posterImg = document.createElement('img');
+    posterImg.src = "images/海报.jpg"; // 直接使用路径
+    posterImg.alt = "新年海报";
+    posterImg.style.cssText = `
+        max-width: 100%;
+        max-height: 65vh;
+        width: auto;
+        height: auto;
+        border-radius: 20px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+        border: 4px solid #ffd700;
+        object-fit: contain;
+    `;
+    
+    // 获取当前签文
+    const currentFortune = document.getElementById('fortuneText')?.textContent || '';
+    
+    // 图片加载失败时的备用显示
+    posterImg.onerror = function() {
+        this.style.display = 'none';
+        const errorDiv = document.createElement('div');
+        errorDiv.style.cssText = `
+            color: white;
+            font-size: 20px;
+            padding: 50px 30px;
+            background: linear-gradient(135deg, #c1272d, #ff6b6b);
+            border-radius: 20px;
+            border: 4px solid #ffd700;
+            text-align: center;
+            min-width: 280px;
+        `;
+        errorDiv.innerHTML = game.language === 'zh' ? 
+            `❌ 海报图片加载失败<br><br>
+             🎋 今日好运签：${currentFortune}<br><br>
+             📸 请截图保存分享<br>
+             <span style="font-size: 16px; opacity: 0.9;">分享好友一起体验广府年味！</span>` : 
+            `❌ Poster loading failed<br><br>
+             🎋 Fortune: ${currentFortune}<br><br>
+             📸 Please take a screenshot<br>
+             <span style="font-size: 16px; opacity: 0.9;">Share with friends to experience Cantonese New Year!</span>`;
+        posterContainer.appendChild(errorDiv);
+    };
+    
+    posterContainer.appendChild(posterImg);
+    
+    // 创建双语提示文字
+    const hintText = document.createElement('div');
+    hintText.style.cssText = `
+        color: white;
+        text-align: center;
+        margin: 25px 0 20px;
+        padding: 18px 25px;
+        background: rgba(193, 39, 45, 0.9);
+        border-radius: 50px;
+        border: 2px solid #ffd700;
+        max-width: 90%;
+        font-size: 18px;
+        line-height: 1.8;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    `;
+    
+    // 根据当前语言设置提示文字
+    if (game.language === 'zh') {
+        hintText.innerHTML = `
+            🎋 今日好运签：${currentFortune}<br>
+            📸 长按海报保存图片，分享给朋友<br>
+            <span style="font-size: 15px; opacity: 0.9;">Long press to save and share with friends!</span>
+        `;
+    } else {
+        hintText.innerHTML = `
+            🎋 Fortune: ${currentFortune}<br>
+            📸 Long press the poster to save image<br>
+            <span style="font-size: 15px; opacity: 0.9;">长按保存图片，分享好友一起体验！</span>
+        `;
+    }
+    
+    // 创建关闭按钮
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = game.language === 'zh' ? '✕ 关 闭' : '✕ Close';
+    closeBtn.style.cssText = `
+        background: #ffd700;
+        color: #c1272d;
+        border: none;
+        padding: 14px 40px;
+        border-radius: 30px;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 15px;
+        border: 2px solid white;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    `;
+    
+    // 添加悬停效果
+    closeBtn.onmouseover = function() {
+        this.style.transform = 'scale(1.05)';
+        this.style.background = '#c1272d';
+        this.style.color = '#ffd700';
+    };
+    
+    closeBtn.onmouseout = function() {
+        this.style.transform = 'scale(1)';
+        this.style.background = '#ffd700';
+        this.style.color = '#c1272d';
+    };
+    
+    // 触摸设备效果
+    closeBtn.ontouchstart = function() {
+        this.style.transform = 'scale(0.95)';
+        this.style.background = '#c1272d';
+        this.style.color = '#ffd700';
+    };
+    
+    closeBtn.ontouchend = function() {
+        this.style.transform = 'scale(1)';
+    };
+    
+    closeBtn.onclick = function() {
+        document.body.removeChild(modal);
+    };
+    
+    // 组装弹窗
+    modal.appendChild(posterContainer);
+    modal.appendChild(hintText);
+    modal.appendChild(closeBtn);
+    
+    // 添加到页面
+    document.body.appendChild(modal);
+    
+    // 点击背景也可以关闭
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            document.body.removeChild(modal);
         }
+    });
+    
+    // 震动反馈（如果支持）
+    if (navigator.vibrate) {
+        navigator.vibrate(50);
+    }
+}
 
         function showMessage(text) {
             const msg = document.getElementById('message');
@@ -2074,3 +2246,4 @@
     </script>
 </body>
 </html>
+
