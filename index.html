@@ -1713,112 +1713,108 @@ poster: "images/海报.jpg"
         };
 
         // ==================== 初始化 ====================
-        function init() {
-            console.log("游戏初始化...");
-            
-            const bgWrapper = document.getElementById('bgWrapper');
-            const bgImg = document.getElementById('bgImage');
-            const languagePage = document.getElementById('languagePage');
-            
-            // 强制设置父容器为相对定位
-            languagePage.style.position = 'relative';
-            
-            // 设置图片加载失败的处理
-            function setupImageErrorHandling() {
-                const images = document.querySelectorAll('img');
-                images.forEach(img => {
-                    img.addEventListener('error', function() {
-                        console.log(`图片加载失败: ${this.src}`);
-                        if (this.id === 'bgImage') {
-                            bgWrapper.classList.add('bg-fallback');
-                        }
-                    });
-                });
-            }
-            
-            // 尝试加载背景图
-            bgImg.src = gameImages.languageBg;
-            
-            // 图片加载成功
-            bgImg.onload = function() {
-                bgWrapper.classList.remove('bg-fallback');
-                bgImg.style.display = 'block';
-                console.log("背景图加载成功");
-            };
-            
-            // 图片加载失败
-            bgImg.onerror = function() {
-                console.log("背景图加载失败，使用纯色纹理背景");
-                bgWrapper.classList.add('bg-fallback');
-                bgImg.style.display = 'none';
-            };
-            
-            // 二维码图片
-            const qrImg = document.getElementById('qrcodeImg');
-            qrImg.src = gameImages.qrcode;
-            qrImg.onerror = function() {
-                console.log("二维码加载失败");
-            };
-            
-            // 设置所有图片的错误处理
-            setupImageErrorHandling();
-            
-            // 获取语言按钮
-            const chineseBtn = document.getElementById('chineseBtn');
-            const englishBtn = document.getElementById('englishBtn');
-            
-            // 为语言按钮添加点击事件 - 同时播放BGM
-            chineseBtn.addEventListener('click', function(e) {
-                // 先播放BGM
-                playBGM().catch(() => {
-                    console.log('中文按钮点击后播放BGM失败');
-                });
-                // 然后开始游戏
-                startGame('zh');
+function init() {
+    console.log("游戏初始化...");
+    
+    const bgWrapper = document.getElementById('bgWrapper');
+    const bgImg = document.getElementById('bgImage');
+    const languagePage = document.getElementById('languagePage');
+    
+    // 强制设置父容器为相对定位
+    languagePage.style.position = 'relative';
+    
+    // 设置图片加载失败的处理
+    function setupImageErrorHandling() {
+        const images = document.querySelectorAll('img');
+        images.forEach(img => {
+            img.addEventListener('error', function() {
+                console.log(`图片加载失败: ${this.src}`);
+                if (this.id === 'bgImage') {
+                    bgWrapper.classList.add('bg-fallback');
+                }
             });
-            
-            englishBtn.addEventListener('click', function(e) {
-                // 先播放BGM
-                playBGM().catch(() => {
-                    console.log('英文按钮点击后播放BGM失败');
-                });
-                // 然后开始游戏
-                startGame('en');
-            });
-            
-           document.getElementById('rulesBtn').addEventListener('click', function() {
-    showRulesModal();
-});
-            
-            document.getElementById('rulesClose').addEventListener('click', function() {
-                document.getElementById('rulesModal').classList.remove('active');
-            });
-            
-            document.getElementById('shareBtn').addEventListener('click', shareFortune);
-            document.getElementById('retryBtn').addEventListener('click', drawFortune);
-            document.getElementById('homeBtn').addEventListener('click', backToHome);
-            document.getElementById('drawFortuneBtn').addEventListener('click', showFortunePage);
-            
-            document.getElementById('polaroidModal').addEventListener('click', function() {
-                this.classList.remove('active');
-            });
-            
-            // 初始化 BGM
-            setTimeout(() => {
-                initBGM();
-            }, 100);
-            
-            // 尝试在页面任何地方点击时播放BGM（除了特定按钮）
-            document.body.addEventListener('click', function bgmOnAnyClick() {
-                playBGM().catch(() => {});
-                // 只触发一次后就移除
-                document.body.removeEventListener('click', bgmOnAnyClick);
-            }, { once: true });
-            
-            console.log("初始化完成");
-        }
-
-       // ==================== 开始游戏 ====================
+        });
+    }
+    
+    // 尝试加载背景图
+    bgImg.src = gameImages.languageBg;
+    
+    // 图片加载成功
+    bgImg.onload = function() {
+        bgWrapper.classList.remove('bg-fallback');
+        bgImg.style.display = 'block';
+        console.log("背景图加载成功");
+    };
+    
+    // 图片加载失败
+    bgImg.onerror = function() {
+        console.log("背景图加载失败，使用纯色纹理背景");
+        bgWrapper.classList.add('bg-fallback');
+        bgImg.style.display = 'none';
+    };
+    
+    // 二维码图片
+    const qrImg = document.getElementById('qrcodeImg');
+    qrImg.src = gameImages.qrcode;
+    qrImg.onerror = function() {
+        console.log("二维码加载失败");
+    };
+    
+    // 设置所有图片的错误处理
+    setupImageErrorHandling();
+    
+    // ===== 语言按钮事件（同时触发规则弹窗和BGM）=====
+    document.getElementById('chineseBtn').addEventListener('click', function(e) {
+        // 播放BGM
+        playBGM().catch(() => {});
+        // 显示规则弹窗
+        showRulesModal();
+        // 开始游戏
+        startGame('zh');
+    });
+    
+    document.getElementById('englishBtn').addEventListener('click', function(e) {
+        // 播放BGM
+        playBGM().catch(() => {});
+        // 显示规则弹窗
+        showRulesModal();
+        // 开始游戏
+        startGame('en');
+    });
+    
+    // ===== 规则按钮事件 =====
+    document.getElementById('rulesBtn').addEventListener('click', function() {
+        showRulesModal();
+    });
+    
+    // ===== 规则弹窗关闭按钮 =====
+    document.getElementById('rulesClose').addEventListener('click', function() {
+        document.getElementById('rulesModal').classList.remove('active');
+    });
+    
+    // ===== 其他按钮事件 =====
+    document.getElementById('shareBtn').addEventListener('click', shareFortune);
+    document.getElementById('retryBtn').addEventListener('click', drawFortune);
+    document.getElementById('homeBtn').addEventListener('click', backToHome);
+    document.getElementById('drawFortuneBtn').addEventListener('click', showFortunePage);
+    
+    document.getElementById('polaroidModal').addEventListener('click', function() {
+        this.classList.remove('active');
+    });
+    
+    // 初始化 BGM
+    setTimeout(() => {
+        initBGM();
+    }, 100);
+    
+    // 尝试在页面任何地方点击时播放BGM（仅一次）
+    document.body.addEventListener('click', function bgmOnAnyClick() {
+        playBGM().catch(() => {});
+        document.body.removeEventListener('click', bgmOnAnyClick);
+    }, { once: true });
+    
+    console.log("初始化完成");
+}// ==================== 开始游戏 ====================
 function startGame(lang) {
     console.log("开始游戏，语言:", lang);
     game.language = lang;
@@ -1833,8 +1829,7 @@ function startGame(lang) {
     
     updateLanguageUI();
     
-    // 显示规则弹窗（首次点击语言选项时）
-    showRulesModal();
+    // 注意：这里没有 showRulesModal() 调用，规则弹窗已经在点击按钮时触发了
     
     document.getElementById('languagePage').classList.remove('active');
     document.getElementById('gamePage').classList.add('active');
@@ -1846,14 +1841,16 @@ function startGame(lang) {
 // ==================== 显示规则弹窗 ====================
 function showRulesModal() {
     const rulesModal = document.getElementById('rulesModal');
-    rulesModal.classList.add('active');
-    
-    // 可选：3秒后自动关闭（如果不想自动关闭，可以删除这个setTimeout）
-    setTimeout(() => {
-        if (rulesModal.classList.contains('active')) {
-            rulesModal.classList.remove('active');
-        }
-    }, 8000);
+    if (rulesModal) {
+        rulesModal.classList.add('active');
+        
+        // 可选：8秒后自动关闭
+        setTimeout(() => {
+            if (rulesModal.classList.contains('active')) {
+                rulesModal.classList.remove('active');
+            }
+        }, 8000);
+    }
 }
         // ==================== 更新界面语言 ====================
         function updateLanguageUI() {
@@ -2260,6 +2257,7 @@ function shareFortune() {
     </script>
 </body>
 </html>
+
 
 
 
