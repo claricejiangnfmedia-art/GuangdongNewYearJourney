@@ -982,7 +982,7 @@
         // ==================== BGM 控制 - 终极自动播放方案 ====================
         const bgmConfig = {
             audio: null,
-            isMuted: false,  // 初始为非静音状态
+            isMuted: false,
             isPlaying: false,
             playAttempts: 0
         };
@@ -995,21 +995,17 @@
             
             if (!bgmConfig.audio) return Promise.reject('音频元素不存在');
             
-            // 如果已经在播放且非静音，就不重复播放
             if (bgmConfig.isPlaying && !bgmConfig.audio.paused && !bgmConfig.isMuted) {
                 return Promise.resolve();
             }
             
-            // 确保不是静音状态
             bgmConfig.audio.muted = bgmConfig.isMuted;
             
-            // 尝试播放
             return bgmConfig.audio.play()
                 .then(() => {
                     console.log('✅ BGM 播放成功');
                     bgmConfig.isPlaying = true;
                     
-                    // 更新按钮样式
                     const bgmBtn = document.getElementById('bgmToggle');
                     if (bgmBtn) {
                         if (bgmConfig.isMuted) {
@@ -1035,35 +1031,29 @@
             
             if (!bgmConfig.audio || !bgmBtn) return;
             
-            // 设置初始音量和状态 - 非静音
             bgmConfig.audio.volume = 0.4;
             bgmConfig.audio.muted = false;
             bgmConfig.isMuted = false;
             bgmBtn.classList.remove('muted');
             bgmBtn.innerHTML = '🎵';
             
-            // 预加载音频
             bgmConfig.audio.load();
             
-            // 尝试自动播放
             setTimeout(() => {
                 playBGM().catch(() => {
                     console.log('自动播放失败，等待用户交互');
                 });
             }, 500);
             
-            // BGM 按钮点击事件 - 切换静音状态
             bgmBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 e.preventDefault();
                 
                 if (!bgmConfig.audio) return;
                 
-                // 切换静音状态
                 bgmConfig.isMuted = !bgmConfig.isMuted;
                 bgmConfig.audio.muted = bgmConfig.isMuted;
                 
-                // 更新按钮样式
                 if (bgmConfig.isMuted) {
                     bgmBtn.classList.add('muted');
                     bgmBtn.innerHTML = '🔇';
@@ -1071,7 +1061,6 @@
                     bgmBtn.classList.remove('muted');
                     bgmBtn.innerHTML = '🎵';
                     
-                    // 如果没在播放，尝试播放
                     if (!bgmConfig.isPlaying || bgmConfig.audio.paused) {
                         playBGM();
                     }
@@ -1080,7 +1069,6 @@
                 console.log('BGM 静音状态:', bgmConfig.isMuted);
             });
             
-            // 处理页面可见性变化
             document.addEventListener('visibilitychange', function() {
                 if (!document.hidden && !bgmConfig.isMuted && bgmConfig.audio.paused) {
                     playBGM().catch(e => console.log('恢复播放失败:', e));
@@ -1158,10 +1146,8 @@
                     }
                 }
             ],
-            // 在 gameImages 对象中添加
-qrcode: "images/分享二维码.png",
-// 添加这行：
-poster: "images/海报.jpg"
+            qrcode: "images/分享二维码.png",
+            poster: "images/海报.jpg"
         };
 
         // ==================== 游戏数据 ====================
@@ -1713,194 +1699,207 @@ poster: "images/海报.jpg"
         };
 
         // ==================== 初始化 ====================
-     
-// ==================== 显示规则弹窗（供规则按钮使用）====================
-function showRulesModal() {
-    const rulesModal = document.getElementById('rulesModal');
-    if (rulesModal) {
-        rulesModal.style.zIndex = '10001';
-        rulesModal.classList.add('active');
-        
-        // 可选：8秒后自动关闭
-        setTimeout(() => {
-            if (rulesModal.classList.contains('active')) {
-                rulesModal.classList.remove('active');
-                setTimeout(() => {
-                    rulesModal.style.zIndex = '100';
-                }, 300);
+        function init() {
+            console.log("游戏初始化...");
+            
+            const bgWrapper = document.getElementById('bgWrapper');
+            const bgImg = document.getElementById('bgImage');
+            const languagePage = document.getElementById('languagePage');
+            
+            languagePage.style.position = 'relative';
+            
+            function setupImageErrorHandling() {
+                const images = document.querySelectorAll('img');
+                images.forEach(img => {
+                    img.addEventListener('error', function() {
+                        console.log(`图片加载失败: ${this.src}`);
+                        if (this.id === 'bgImage') {
+                            bgWrapper.classList.add('bg-fallback');
+                        }
+                    });
+                });
             }
-        }, 8000);
-    }
-}
-function init() {
-    console.log("游戏初始化...");
-    
-    const bgWrapper = document.getElementById('bgWrapper');
-    const bgImg = document.getElementById('bgImage');
-    const languagePage = document.getElementById('languagePage');
-    
-    // 强制设置父容器为相对定位
-    languagePage.style.position = 'relative';
-    
-    // 设置图片加载失败的处理
-    function setupImageErrorHandling() {
-        const images = document.querySelectorAll('img');
-        images.forEach(img => {
-            img.addEventListener('error', function() {
-                console.log(`图片加载失败: ${this.src}`);
-                if (this.id === 'bgImage') {
-                    bgWrapper.classList.add('bg-fallback');
+            
+            bgImg.src = gameImages.languageBg;
+            
+            bgImg.onload = function() {
+                bgWrapper.classList.remove('bg-fallback');
+                bgImg.style.display = 'block';
+                console.log("背景图加载成功");
+            };
+            
+            bgImg.onerror = function() {
+                console.log("背景图加载失败，使用纯色纹理背景");
+                bgWrapper.classList.add('bg-fallback');
+                bgImg.style.display = 'none';
+            };
+            
+            const qrImg = document.getElementById('qrcodeImg');
+            qrImg.src = gameImages.qrcode;
+            qrImg.onerror = function() {
+                console.log("二维码加载失败");
+            };
+            
+            setupImageErrorHandling();
+            
+            // ===== 语言按钮事件（先显示规则，再开始游戏）=====
+            document.getElementById('chineseBtn').addEventListener('click', function(e) {
+                // 播放BGM
+                playBGM().catch(() => {});
+                
+                // 设置游戏语言和数据
+                game.language = 'zh';
+                game.currentScene = 0;
+                game.luck = 88;
+                game.money = 100;
+                game.happiness = 100;
+                game.collectedItems = [];
+                game.achievements = [];
+                game.selectedOptions = [];
+                game.choiceTypes = { traditional: 0, modern: 0, family: 0, social: 0 };
+                
+                updateLanguageUI();
+                
+                // 先显示规则弹窗（在语言页面上）
+                const rulesModal = document.getElementById('rulesModal');
+                rulesModal.style.zIndex = '10001';
+                rulesModal.classList.add('active');
+                
+                // 延迟5秒后自动开始游戏（给玩家阅读规则的时间）
+                setTimeout(function() {
+                    // 如果规则弹窗还在显示，就关闭它并开始游戏
+                    if (rulesModal.classList.contains('active')) {
+                        rulesModal.classList.remove('active');
+                        
+                        // 切换到游戏页面
+                        document.getElementById('languagePage').classList.remove('active');
+                        document.getElementById('gamePage').classList.add('active');
+                        
+                        // 加载第一个场景
+                        loadScene();
+                        
+                        // 恢复z-index
+                        setTimeout(() => {
+                            rulesModal.style.zIndex = '100';
+                        }, 300);
+                    }
+                }, 5000);
+                
+                // 修改关闭按钮，点击后立即开始游戏
+                const closeBtn = document.getElementById('rulesClose');
+                closeBtn.onclick = function() {
+                    rulesModal.classList.remove('active');
+                    
+                    // 切换到游戏页面
+                    document.getElementById('languagePage').classList.remove('active');
+                    document.getElementById('gamePage').classList.add('active');
+                    
+                    // 加载第一个场景
+                    loadScene();
+                    
+                    // 恢复z-index
+                    setTimeout(() => {
+                        rulesModal.style.zIndex = '100';
+                    }, 300);
+                    
+                    return false;
+                };
+            });
+            
+            document.getElementById('englishBtn').addEventListener('click', function(e) {
+                // 播放BGM
+                playBGM().catch(() => {});
+                
+                // 设置游戏语言和数据
+                game.language = 'en';
+                game.currentScene = 0;
+                game.luck = 88;
+                game.money = 100;
+                game.happiness = 100;
+                game.collectedItems = [];
+                game.achievements = [];
+                game.selectedOptions = [];
+                game.choiceTypes = { traditional: 0, modern: 0, family: 0, social: 0 };
+                
+                updateLanguageUI();
+                
+                // 先显示规则弹窗（在语言页面上）
+                const rulesModal = document.getElementById('rulesModal');
+                rulesModal.style.zIndex = '10001';
+                rulesModal.classList.add('active');
+                
+                // 延迟5秒后自动开始游戏
+                setTimeout(function() {
+                    if (rulesModal.classList.contains('active')) {
+                        rulesModal.classList.remove('active');
+                        
+                        document.getElementById('languagePage').classList.remove('active');
+                        document.getElementById('gamePage').classList.add('active');
+                        
+                        loadScene();
+                        
+                        setTimeout(() => {
+                            rulesModal.style.zIndex = '100';
+                        }, 300);
+                    }
+                }, 5000);
+                
+                // 修改关闭按钮，点击后立即开始游戏
+                const closeBtn = document.getElementById('rulesClose');
+                closeBtn.onclick = function() {
+                    rulesModal.classList.remove('active');
+                    
+                    document.getElementById('languagePage').classList.remove('active');
+                    document.getElementById('gamePage').classList.add('active');
+                    
+                    loadScene();
+                    
+                    setTimeout(() => {
+                        rulesModal.style.zIndex = '100';
+                    }, 300);
+                    
+                    return false;
+                };
+            });
+            
+            // ===== 规则按钮事件 =====
+            document.getElementById('rulesBtn').addEventListener('click', function() {
+                const rulesModal = document.getElementById('rulesModal');
+                if (rulesModal) {
+                    rulesModal.classList.add('active');
+                    
+                    setTimeout(() => {
+                        if (rulesModal.classList.contains('active')) {
+                            rulesModal.classList.remove('active');
+                        }
+                    }, 8000);
                 }
             });
-        });
-    }
-    
-    // 尝试加载背景图
-    bgImg.src = gameImages.languageBg;
-    
-    // 图片加载成功
-    bgImg.onload = function() {
-        bgWrapper.classList.remove('bg-fallback');
-        bgImg.style.display = 'block';
-        console.log("背景图加载成功");
-    };
-    
-    // 图片加载失败
-    bgImg.onerror = function() {
-        console.log("背景图加载失败，使用纯色纹理背景");
-        bgWrapper.classList.add('bg-fallback');
-        bgImg.style.display = 'none';
-    };
-    
-    // 二维码图片
-    const qrImg = document.getElementById('qrcodeImg');
-    qrImg.src = gameImages.qrcode;
-    qrImg.onerror = function() {
-        console.log("二维码加载失败");
-    };
-    
-    // 设置所有图片的错误处理
-    setupImageErrorHandling();
-    
-    // ===== 语言按钮事件（先显示规则，再开始游戏）=====
-document.getElementById('chineseBtn').addEventListener('click', function(e) {
-    // 播放BGM
-    playBGM().catch(() => {});
-    
-    // 设置游戏语言和数据
-    game.language = 'zh';
-    game.currentScene = 0;
-    game.luck = 88;
-    game.money = 100;
-    game.happiness = 100;
-    game.collectedItems = [];
-    game.achievements = [];
-    game.selectedOptions = [];
-    game.choiceTypes = { traditional: 0, modern: 0, family: 0, social: 0 };
-    
-    updateLanguageUI();
-    
-    // 先显示规则弹窗（在语言页面上）
-    const rulesModal = document.getElementById('rulesModal');
-    rulesModal.style.zIndex = '10001';
-    rulesModal.classList.add('active');
-    
-    // 延迟5秒后自动开始游戏（给玩家阅读规则的时间）
-    setTimeout(function() {
-        // 如果规则弹窗还在显示，就关闭它并开始游戏
-        if (rulesModal.classList.contains('active')) {
-            rulesModal.classList.remove('active');
             
-            // 切换到游戏页面
-            document.getElementById('languagePage').classList.remove('active');
-            document.getElementById('gamePage').classList.add('active');
+            // ===== 其他按钮事件 =====
+            document.getElementById('shareBtn').addEventListener('click', shareFortune);
+            document.getElementById('retryBtn').addEventListener('click', drawFortune);
+            document.getElementById('homeBtn').addEventListener('click', backToHome);
+            document.getElementById('drawFortuneBtn').addEventListener('click', showFortunePage);
             
-            // 加载第一个场景
-            loadScene();
+            document.getElementById('polaroidModal').addEventListener('click', function() {
+                this.classList.remove('active');
+            });
             
-            // 恢复z-index
+            // 初始化 BGM
             setTimeout(() => {
-                rulesModal.style.zIndex = '100';
-            }, 300);
+                initBGM();
+            }, 100);
+            
+            // 尝试在页面任何地方点击时播放BGM（仅一次）
+            document.body.addEventListener('click', function bgmOnAnyClick() {
+                playBGM().catch(() => {});
+                document.body.removeEventListener('click', bgmOnAnyClick);
+            }, { once: true });
+            
+            console.log("初始化完成");
         }
-    }, 5000);
-    
-    // 修改关闭按钮，点击后立即开始游戏
-    const closeBtn = document.getElementById('rulesClose');
-    closeBtn.onclick = function() {
-        rulesModal.classList.remove('active');
-        
-        // 切换到游戏页面
-        document.getElementById('languagePage').classList.remove('active');
-        document.getElementById('gamePage').classList.add('active');
-        
-        // 加载第一个场景
-        loadScene();
-        
-        // 恢复z-index
-        setTimeout(() => {
-            rulesModal.style.zIndex = '100';
-        }, 300);
-        
-        return false;
-    };
-});
 
-document.getElementById('englishBtn').addEventListener('click', function(e) {
-    // 播放BGM
-    playBGM().catch(() => {});
-    
-    // 设置游戏语言和数据
-    game.language = 'en';
-    game.currentScene = 0;
-    game.luck = 88;
-    game.money = 100;
-    game.happiness = 100;
-    game.collectedItems = [];
-    game.achievements = [];
-    game.selectedOptions = [];
-    game.choiceTypes = { traditional: 0, modern: 0, family: 0, social: 0 };
-    
-    updateLanguageUI();
-    
-    // 先显示规则弹窗（在语言页面上）
-    const rulesModal = document.getElementById('rulesModal');
-    rulesModal.style.zIndex = '10001';
-    rulesModal.classList.add('active');
-    
-    // 延迟5秒后自动开始游戏
-    setTimeout(function() {
-        if (rulesModal.classList.contains('active')) {
-            rulesModal.classList.remove('active');
-            
-            document.getElementById('languagePage').classList.remove('active');
-            document.getElementById('gamePage').classList.add('active');
-            
-            loadScene();
-            
-            setTimeout(() => {
-                rulesModal.style.zIndex = '100';
-            }, 300);
-        }
-    }, 5000);
-    
-    // 修改关闭按钮，点击后立即开始游戏
-    const closeBtn = document.getElementById('rulesClose');
-    closeBtn.onclick = function() {
-        rulesModal.classList.remove('active');
-        
-        document.getElementById('languagePage').classList.remove('active');
-        document.getElementById('gamePage').classList.add('active');
-        
-        loadScene();
-        
-        setTimeout(() => {
-            rulesModal.style.zIndex = '100';
-        }, 300);
-        
-        return false;
-    };
-});
         // ==================== 更新界面语言 ====================
         function updateLanguageUI() {
             const langData = gameData[game.language];
@@ -2106,180 +2105,169 @@ document.getElementById('englishBtn').addEventListener('click', function(e) {
         }
 
         // ==================== 分享海报功能 ====================
-function shareFortune() {
-    // 创建弹窗容器
-    const modal = document.createElement('div');
-    modal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.95);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 10000;
-        flex-direction: column;
-        padding: 20px;
-        box-sizing: border-box;
-    `;
-    
-    // 创建海报容器
-    const posterContainer = document.createElement('div');
-    posterContainer.style.cssText = `
-        max-width: 100%;
-        max-height: 70vh;
-        text-align: center;
-        position: relative;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    `;
-    
-    // 创建海报图片
-    const posterImg = document.createElement('img');
-    posterImg.src = "images/海报.jpg"; // 直接使用路径
-    posterImg.alt = "新年海报";
-    posterImg.style.cssText = `
-        max-width: 100%;
-        max-height: 65vh;
-        width: auto;
-        height: auto;
-        border-radius: 20px;
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
-        border: 4px solid #ffd700;
-        object-fit: contain;
-    `;
-    
-    // 获取当前签文
-    const currentFortune = document.getElementById('fortuneText')?.textContent || '';
-    
-    // 图片加载失败时的备用显示
-    posterImg.onerror = function() {
-        this.style.display = 'none';
-        const errorDiv = document.createElement('div');
-        errorDiv.style.cssText = `
-            color: white;
-            font-size: 20px;
-            padding: 50px 30px;
-            background: linear-gradient(135deg, #c1272d, #ff6b6b);
-            border-radius: 20px;
-            border: 4px solid #ffd700;
-            text-align: center;
-            min-width: 280px;
-        `;
-        errorDiv.innerHTML = game.language === 'zh' ? 
-            `❌ 海报图片加载失败<br><br>
-             🎋 今日好运签：${currentFortune}<br><br>
-             📸 请截图保存分享<br>
-             <span style="font-size: 16px; opacity: 0.9;">分享好友一起体验广府年味！</span>` : 
-            `❌ Poster loading failed<br><br>
-             🎋 Fortune: ${currentFortune}<br><br>
-             📸 Please take a screenshot<br>
-             <span style="font-size: 16px; opacity: 0.9;">Share with friends to experience Cantonese New Year!</span>`;
-        posterContainer.appendChild(errorDiv);
-    };
-    
-    posterContainer.appendChild(posterImg);
-    
-    // 创建双语提示文字
-    const hintText = document.createElement('div');
-    hintText.style.cssText = `
-        color: white;
-        text-align: center;
-        margin: 25px 0 20px;
-        padding: 18px 25px;
-        background: rgba(193, 39, 45, 0.9);
-        border-radius: 50px;
-        border: 2px solid #ffd700;
-        max-width: 90%;
-        font-size: 18px;
-        line-height: 1.8;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    `;
-    
-    // 根据当前语言设置提示文字
-    if (game.language === 'zh') {
-        hintText.innerHTML = `
-            🎋 今日好运签：${currentFortune}<br>
-            📸 长按海报保存图片，分享给朋友<br>
-            <span style="font-size: 15px; opacity: 0.9;">Long press to save and share with friends!</span>
-        `;
-    } else {
-        hintText.innerHTML = `
-            🎋 Fortune: ${currentFortune}<br>
-            📸 Long press the poster to save image<br>
-            <span style="font-size: 15px; opacity: 0.9;">长按保存图片，分享好友一起体验！</span>
-        `;
-    }
-    
-    // 创建关闭按钮
-    const closeBtn = document.createElement('button');
-    closeBtn.textContent = game.language === 'zh' ? '✕ 关 闭' : '✕ Close';
-    closeBtn.style.cssText = `
-        background: #ffd700;
-        color: #c1272d;
-        border: none;
-        padding: 14px 40px;
-        border-radius: 30px;
-        font-size: 18px;
-        font-weight: bold;
-        cursor: pointer;
-        margin-top: 15px;
-        border: 2px solid white;
-        transition: all 0.3s ease;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    `;
-    
-    // 添加悬停效果
-    closeBtn.onmouseover = function() {
-        this.style.transform = 'scale(1.05)';
-        this.style.background = '#c1272d';
-        this.style.color = '#ffd700';
-    };
-    
-    closeBtn.onmouseout = function() {
-        this.style.transform = 'scale(1)';
-        this.style.background = '#ffd700';
-        this.style.color = '#c1272d';
-    };
-    
-    // 触摸设备效果
-    closeBtn.ontouchstart = function() {
-        this.style.transform = 'scale(0.95)';
-        this.style.background = '#c1272d';
-        this.style.color = '#ffd700';
-    };
-    
-    closeBtn.ontouchend = function() {
-        this.style.transform = 'scale(1)';
-    };
-    
-    closeBtn.onclick = function() {
-        document.body.removeChild(modal);
-    };
-    
-    // 组装弹窗
-    modal.appendChild(posterContainer);
-    modal.appendChild(hintText);
-    modal.appendChild(closeBtn);
-    
-    // 添加到页面
-    document.body.appendChild(modal);
-    
-    // 点击背景也可以关闭
-    modal.addEventListener('click', function(e) {
-        if (e.target === modal) {
-            document.body.removeChild(modal);
+        function shareFortune() {
+            // 创建弹窗容器
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.95);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 10000;
+                flex-direction: column;
+                padding: 20px;
+                box-sizing: border-box;
+            `;
+            
+            // 创建海报容器
+            const posterContainer = document.createElement('div');
+            posterContainer.style.cssText = `
+                max-width: 100%;
+                max-height: 70vh;
+                text-align: center;
+                position: relative;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            `;
+            
+            // 创建海报图片
+            const posterImg = document.createElement('img');
+            posterImg.src = "images/海报.jpg";
+            posterImg.alt = "新年海报";
+            posterImg.style.cssText = `
+                max-width: 100%;
+                max-height: 65vh;
+                width: auto;
+                height: auto;
+                border-radius: 20px;
+                box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+                border: 4px solid #ffd700;
+                object-fit: contain;
+            `;
+            
+            const currentFortune = document.getElementById('fortuneText')?.textContent || '';
+            
+            posterImg.onerror = function() {
+                this.style.display = 'none';
+                const errorDiv = document.createElement('div');
+                errorDiv.style.cssText = `
+                    color: white;
+                    font-size: 20px;
+                    padding: 50px 30px;
+                    background: linear-gradient(135deg, #c1272d, #ff6b6b);
+                    border-radius: 20px;
+                    border: 4px solid #ffd700;
+                    text-align: center;
+                    min-width: 280px;
+                `;
+                errorDiv.innerHTML = game.language === 'zh' ? 
+                    `❌ 海报图片加载失败<br><br>
+                     🎋 今日好运签：${currentFortune}<br><br>
+                     📸 请截图保存分享<br>
+                     <span style="font-size: 16px; opacity: 0.9;">分享好友一起体验广府年味！</span>` : 
+                    `❌ Poster loading failed<br><br>
+                     🎋 Fortune: ${currentFortune}<br><br>
+                     📸 Please take a screenshot<br>
+                     <span style="font-size: 16px; opacity: 0.9;">Share with friends to experience Cantonese New Year!</span>`;
+                posterContainer.appendChild(errorDiv);
+            };
+            
+            posterContainer.appendChild(posterImg);
+            
+            const hintText = document.createElement('div');
+            hintText.style.cssText = `
+                color: white;
+                text-align: center;
+                margin: 25px 0 20px;
+                padding: 18px 25px;
+                background: rgba(193, 39, 45, 0.9);
+                border-radius: 50px;
+                border: 2px solid #ffd700;
+                max-width: 90%;
+                font-size: 18px;
+                line-height: 1.8;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            `;
+            
+            if (game.language === 'zh') {
+                hintText.innerHTML = `
+                    🎋 今日好运签：${currentFortune}<br>
+                    📸 长按海报保存图片，分享给朋友<br>
+                    <span style="font-size: 15px; opacity: 0.9;">Long press to save and share with friends!</span>
+                `;
+            } else {
+                hintText.innerHTML = `
+                    🎋 Fortune: ${currentFortune}<br>
+                    📸 Long press the poster to save image<br>
+                    <span style="font-size: 15px; opacity: 0.9;">长按保存图片，分享好友一起体验！</span>
+                `;
+            }
+            
+            const closeBtn = document.createElement('button');
+            closeBtn.textContent = game.language === 'zh' ? '✕ 关 闭' : '✕ Close';
+            closeBtn.style.cssText = `
+                background: #ffd700;
+                color: #c1272d;
+                border: none;
+                padding: 14px 40px;
+                border-radius: 30px;
+                font-size: 18px;
+                font-weight: bold;
+                cursor: pointer;
+                margin-top: 15px;
+                border: 2px solid white;
+                transition: all 0.3s ease;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            `;
+            
+            closeBtn.onmouseover = function() {
+                this.style.transform = 'scale(1.05)';
+                this.style.background = '#c1272d';
+                this.style.color = '#ffd700';
+            };
+            
+            closeBtn.onmouseout = function() {
+                this.style.transform = 'scale(1)';
+                this.style.background = '#ffd700';
+                this.style.color = '#c1272d';
+            };
+            
+            closeBtn.ontouchstart = function() {
+                this.style.transform = 'scale(0.95)';
+                this.style.background = '#c1272d';
+                this.style.color = '#ffd700';
+            };
+            
+            closeBtn.ontouchend = function() {
+                this.style.transform = 'scale(1)';
+            };
+            
+            closeBtn.onclick = function() {
+                document.body.removeChild(modal);
+            };
+            
+            modal.appendChild(posterContainer);
+            modal.appendChild(hintText);
+            modal.appendChild(closeBtn);
+            
+            document.body.appendChild(modal);
+            
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    document.body.removeChild(modal);
+                }
+            });
+            
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
         }
-    });
-    
-    // 震动反馈（如果支持）
-    if (navigator.vibrate) {
-        navigator.vibrate(50);
-    }
-}
 
         function showMessage(text) {
             const msg = document.getElementById('message');
@@ -2301,18 +2289,8 @@ function shareFortune() {
             game.selectedOptions = [];
             game.choiceTypes = { traditional: 0, modern: 0, family: 0, social: 0 };
         }
-window.onload = init;
-       // 防止其他代码干扰
-window.startGame = null;
-window.showRulesModal = null;
-window.showRulesModalAndStartGame = null;
+
+        window.onload = init;
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
