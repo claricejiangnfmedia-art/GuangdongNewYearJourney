@@ -1713,37 +1713,81 @@ poster: "images/海报.jpg"
         };
 
         // ==================== 初始化 ====================
-        // ==================== 显示规则弹窗并开始游戏 ====================
+       // ==================== 显示规则弹窗并开始游戏 ====================
 function showRulesModalAndStartGame() {
     const rulesModal = document.getElementById('rulesModal');
     const languagePage = document.getElementById('languagePage');
     const gamePage = document.getElementById('gamePage');
     
-    // 先切换到游戏页面
-    languagePage.classList.remove('active');
-    gamePage.classList.add('active');
-    
-    // 确保规则弹窗的z-index非常高
+    // 修改1：先显示规则弹窗在语言页面上
     rulesModal.style.zIndex = '10001';
-    
-    // 显示规则弹窗
     rulesModal.classList.add('active');
     
-    // 加载第一个场景
-    loadScene();
-    
-    // 可选：8秒后自动关闭规则弹窗
+    // 修改2：延迟切换到游戏页面，让玩家先看完规则
     setTimeout(() => {
+        // 隐藏规则弹窗
+        rulesModal.classList.remove('active');
+        
+        // 切换到游戏页面
+        languagePage.classList.remove('active');
+        gamePage.classList.add('active');
+        
+        // 加载第一个场景
+        loadScene();
+        
+        // 恢复原来的z-index
+        setTimeout(() => {
+            rulesModal.style.zIndex = '100';
+        }, 300);
+    }, 8000); // 8秒后自动开始游戏
+    
+    // 可选：添加点击关闭按钮立即开始的功能
+    const closeBtn = document.getElementById('rulesClose');
+    const originalClickHandler = closeBtn.onclick;
+    
+    closeBtn.onclick = function() {
+        // 清除之前的延时
+        clearTimeout(autoStartTimer);
+        
+        // 隐藏规则弹窗
+        rulesModal.classList.remove('active');
+        
+        // 切换到游戏页面
+        languagePage.classList.remove('active');
+        gamePage.classList.add('active');
+        
+        // 加载第一个场景
+        loadScene();
+        
+        // 恢复z-index
+        setTimeout(() => {
+            rulesModal.style.zIndex = '100';
+        }, 300);
+        
+        // 恢复原来的点击事件（如果有）
+        if (originalClickHandler) {
+            setTimeout(() => {
+                closeBtn.onclick = originalClickHandler;
+            }, 100);
+        }
+    };
+    
+    // 保存定时器，以便在点击关闭按钮时取消
+    var autoStartTimer = setTimeout(() => {
         if (rulesModal.classList.contains('active')) {
             rulesModal.classList.remove('active');
-            // 恢复原来的z-index
+            languagePage.classList.remove('active');
+            gamePage.classList.add('active');
+            loadScene();
             setTimeout(() => {
                 rulesModal.style.zIndex = '100';
             }, 300);
+            
+            // 恢复关闭按钮的原始事件
+            closeBtn.onclick = originalClickHandler;
         }
     }, 8000);
 }
-
 // ==================== 显示规则弹窗（供规则按钮使用）====================
 function showRulesModal() {
     const rulesModal = document.getElementById('rulesModal');
@@ -2329,6 +2373,7 @@ function shareFortune() {
     </script>
 </body>
 </html>
+
 
 
 
